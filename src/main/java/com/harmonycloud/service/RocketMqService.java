@@ -2,10 +2,13 @@ package com.harmonycloud.service;
 
 import com.harmonycloud.bo.UserPrincipal;
 import com.harmonycloud.dto.Aduit;
-import com.harmonycloud.entity.PrescriptionDrug;
+import com.harmonycloud.enums.ErrorMsgEnum;
+import com.harmonycloud.exception.OrderException;
+import com.harmonycloud.result.CimsResponseWrapper;
 import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
 import org.apache.rocketmq.client.producer.SendResult;
+import org.apache.rocketmq.client.producer.SendStatus;
 import org.apache.rocketmq.common.message.Message;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,6 +19,9 @@ import javax.annotation.PostConstruct;
 import java.net.InetAddress;
 import java.util.Date;
 import java.util.UUID;
+
+import static org.apache.rocketmq.client.producer.SendStatus.SEND_OK;
+
 
 @Service
 public class RocketMqService {
@@ -42,16 +48,6 @@ public class RocketMqService {
             e.printStackTrace();
         }
     }
-//
-//    public String send(String topic, String tags, String body) throws InterruptedException, RemotingException, MQClientException, MQBrokerException, UnsupportedEncodingException {
-//        Message message = new Message(topic, tags, body.getBytes(RemotingHelper.DEFAULT_CHARSET));
-//        StopWatch stop = new StopWatch();
-//        stop.start();
-//        SendResult result = producer.send(message);
-//        System.out.println("发送响应：MsgId:" + result.getMsgId() + "，发送状态:" + result.getSendStatus());
-//        stop.stop();
-//        return "{\"MsgId\":\"" + result.getMsgId() + "\"}";
-//    }
 
     public String sendMsg(String topic, String tags, String information) throws Exception {
         UserPrincipal userDetails = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication()
@@ -68,7 +64,11 @@ public class RocketMqService {
         StopWatch stop = new StopWatch();
         stop.start();
         SendResult result = producer.send(message);
-        System.out.println("发送响应：MsgId:" + result.getMsgId() + "，发送状态:" + result.getSendStatus());
+        if (result.getSendStatus().equals(SendStatus.SEND_OK)) {
+            System.out.println("发送响应：MsgId:" + result.getMsgId() + "，发送状态:" + result.getSendStatus());
+        } else {
+            throw new OrderException(ErrorMsgEnum.ROCKETMQ_ERROR.getMessage());
+        }
         stop.stop();
         return "{\"MsgId\":\"" + result.getMsgId() + "\"}";
     }
