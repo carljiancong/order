@@ -1,35 +1,35 @@
 package com.harmonycloud.bo;
 
-import com.harmonycloud.entity.Prescription;
 import com.harmonycloud.entity.PrescriptionDrug;
 
 import java.util.List;
 
 public class PrescriptionDrugBo {
-    private Prescription prescription;
-    private List<PrescriptionDrug> prescriptionDrugList;
+    private List<PrescriptionDrug> oldPrescriptionDrugList;
+    private List<PrescriptionDrug> newPrescriptionDrugList;
 
     public PrescriptionDrugBo() {
     }
 
-    public PrescriptionDrugBo(Prescription prescription, List<PrescriptionDrug> prescriptionDrugList) {
-        this.prescription = prescription;
-        this.prescriptionDrugList = prescriptionDrugList;
+    public PrescriptionDrugBo(List<PrescriptionDrug> oldPrescriptionDrugList, List<PrescriptionDrug> newPrescriptionDrugList) {
+        this.oldPrescriptionDrugList = oldPrescriptionDrugList;
+        this.newPrescriptionDrugList = newPrescriptionDrugList;
     }
 
-    public Prescription getPrescription() {
-        return prescription;
+    public List<PrescriptionDrug> getOldPrescriptionDrugList() {
+        return oldPrescriptionDrugList;
     }
 
-    public void setPrescription(Prescription prescription) {
-        this.prescription = prescription;
+    public void setOldPrescriptionDrugList(List<PrescriptionDrug> oldPrescriptionDrugList) {
+        this.oldPrescriptionDrugList = oldPrescriptionDrugList;
     }
 
-    public List<PrescriptionDrug> getPrescriptionDrugList() {
-        return prescriptionDrugList;
+    public List<PrescriptionDrug> getNewPrescriptionDrugList() {
+        return newPrescriptionDrugList;
     }
 
-    public void setPrescriptionDrugList(List<PrescriptionDrug> prescriptionDrugList) {
-        this.prescriptionDrugList = prescriptionDrugList;
+    public void setNewPrescriptionDrugList(List<PrescriptionDrug> newPrescriptionDrugList) {
+        this.newPrescriptionDrugList = newPrescriptionDrugList;
     }
+
 }

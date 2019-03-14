@@ -1,6 +1,6 @@
 package com.harmonycloud.service;
 
-import com.harmonycloud.bo.PrescriptionDrugBo;
+import com.harmonycloud.dto.PrescriptionDto;
 import com.harmonycloud.bo.UserPrincipal;
 import com.harmonycloud.entity.Prescription;
 import com.harmonycloud.entity.PrescriptionDrug;
@@ -25,32 +25,53 @@ public class PrescriptionService {
     @Autowired
     private PrescriptionDrugService prescriptionDrugService;
 
+    /**
+     * save prescription
+     *
+     * @param prescriptionDto model
+     * @return
+     * @throws Exception
+     */
     @Transactional(rollbackFor = Exception.class)
-    public CimsResponseWrapper<Prescription> savePrescription(PrescriptionDrugBo prescriptionDrugBo) throws Exception {
-        Prescription prescription = prescriptionDrugBo.getPrescription();
-        List<PrescriptionDrug> prescriptionDrugList = prescriptionDrugBo.getPrescriptionDrugList();
-        UserPrincipal userDetails = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication()
-                .getPrincipal();
-        String username = userDetails.getUsername();
-        Date date = new Date();
-        Prescription prescription1 = new Prescription(prescription.getPatientId(), prescription.getEncounterId(), username, date);
-        if (prescriptionRepository.save(prescription1).getPrescriptionId() == null) {
+    public CimsResponseWrapper<Prescription> savePrescription(PrescriptionDto prescriptionDto) throws Exception {
+        Prescription prescription = prescriptionDto.getPrescription();
+        List<PrescriptionDrug> prescriptionDrugList = prescriptionDto.getPrescriptionDrugList();
+        UserPrincipal userDetails = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        prescription.setCreateBy(userDetails.getUsername());
+        prescription.setCreateDate(new Date());
+
+        // save prescription
+        if (prescriptionRepository.save(prescription).getPrescriptionId() == null) {
             throw new OrderException(ErrorMsgEnum.SAVE_ERROR.getMessage());
-        } else {
-            prescriptionDrugService.savePrescriptionDrug(prescriptionDrugList, prescription1.getPrescriptionId());
         }
-        return new CimsResponseWrapper<>(true, null, prescription1);
+
+        // save prescriptionDrug
+        prescriptionDrugService.savePrescriptionDrug(prescriptionDrugList, prescription.getPrescriptionId());
+
+        return new CimsResponseWrapper<>(true, null, prescription);
     }
 
+    /**
+     * saga:save prescription rollback
+     *
+     * @param prescriptionDto model
+     */
     @Transactional(rollbackFor = Exception.class)
-    public void savePrescriptionCancel(PrescriptionDrugBo prescriptionDrugBo) {
-        Prescription prescription = prescriptionDrugBo.getPrescription();
-        List<PrescriptionDrug> prescriptionDrugList = prescriptionDrugBo.getPrescriptionDrugList();
-        Prescription prescription1 = prescriptionRepository.findByEncounterId(prescription.getEncounterId());
+    public void savePrescriptionCancel(PrescriptionDto prescriptionDto) {
+        //delete prescription
+        Integer EncounterId = prescriptionDto.getPrescription().getEncounterId();
+        Prescription prescription = prescriptionRepository.findByEncounterId(EncounterId);
         prescriptionRepository.delete(prescription);
 
-        prescriptionDrugService.savePrescriptionDrugCancel(prescription1.getPrescriptionId());
+        //delete prescriptionDrug
+        prescriptionDrugService.savePrescriptionDrugCancel(prescription.getPrescriptionId());
     }
 
+
+    public CimsResponseWrapper<List> listDrugHistory(Integer patientId) throws Exception {
+        List<Prescription> prescriptionList = prescriptionRepository.findByPatientId(patientId);
+        return new CimsResponseWrapper<List>(true, null, prescriptionList);
+    }
 
 }

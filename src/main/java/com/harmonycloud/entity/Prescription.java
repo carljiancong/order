@@ -1,7 +1,5 @@
 package com.harmonycloud.entity;
 
-import io.swagger.annotations.ApiModelProperty;
-
 import javax.persistence.*;
 import java.util.Date;
 
@@ -11,28 +9,31 @@ public class Prescription {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @ApiModelProperty(name = "处方id", example = "1")
     private Integer prescriptionId;
-    @ApiModelProperty(name = "patient_id", example = "1")
     @Column(name = "patient_id")
     private Integer patientId;
-    @ApiModelProperty(name = "会诊记录id", example = "1")
     @Column(name = "encounter_id")
     private Integer encounterId;
     @Column(name = "create_by")
     private String createBy;
-    @ApiModelProperty(name = "create_date", example = "1")
     @Column(name = "create_date")
     private Date createDate;
+    @Column(name = "clinic_id")
+    private Integer clinicId;
+    @Column(name = "clinic_name")
+    private String clinicName;
+
 
     public Prescription() {
     }
 
-    public Prescription(Integer patientId, Integer encounterId, String createBy, Date createDate) {
+    public Prescription(Integer patientId, Integer encounterId, String createBy, Date createDate, Integer clinicId, String clinicName) {
         this.patientId = patientId;
         this.encounterId = encounterId;
         this.createBy = createBy;
         this.createDate = createDate;
+        this.clinicId = clinicId;
+        this.clinicName = clinicName;
     }
 
     public Integer getPrescriptionId() {
@@ -73,5 +74,21 @@ public class Prescription {
 
     public void setCreateDate(Date createDate) {
         this.createDate = createDate;
+    }
+
+    public Integer getClinicId() {
+        return clinicId;
+    }
+
+    public void setClinicId(Integer clinicId) {
+        this.clinicId = clinicId;
+    }
+
+    public String getClinicName() {
+        return clinicName;
+    }
+
+    public void setClinicName(String clinicName) {
+        this.clinicName = clinicName;
     }
 }

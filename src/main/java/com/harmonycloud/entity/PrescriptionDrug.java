@@ -1,8 +1,5 @@
 package com.harmonycloud.entity;
 
-
-import io.swagger.annotations.ApiModelProperty;
-
 import javax.persistence.*;
 
 @Entity
@@ -11,56 +8,52 @@ public class PrescriptionDrug {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @ApiModelProperty(name = "id", example = "1")
-    private Integer PrescriptionDrugId;
+    private Integer prescriptionDrugId;
     @Column(name = "drug_id")
-    @ApiModelProperty(name = "药品id", example = "1")
-    private Integer DrugId;
+    private Integer drugId;
     @Column(name = "reginmen_line")
-    @ApiModelProperty(name = "剂量")
-    private String ReginmenLine;
+    private String reginmenLine;
     @Column(name = "prescripttion_id")
-    @ApiModelProperty(name = "处方id")
-    private Integer PrescriptionId;
+    private Integer prescriptionId;
 
     public PrescriptionDrug() {
     }
 
     public PrescriptionDrug(Integer drugId, String reginmenLine, Integer prescriptionId) {
-        DrugId = drugId;
-        ReginmenLine = reginmenLine;
-        PrescriptionId = prescriptionId;
+        this.drugId = drugId;
+        this.reginmenLine = reginmenLine;
+        this.prescriptionId = prescriptionId;
     }
 
     public Integer getPrescriptionDrugId() {
-        return PrescriptionDrugId;
+        return prescriptionDrugId;
     }
 
     public void setPrescriptionDrugId(Integer prescriptionDrugId) {
-        PrescriptionDrugId = prescriptionDrugId;
+        this.prescriptionDrugId = prescriptionDrugId;
     }
 
     public Integer getDrugId() {
-        return DrugId;
+        return drugId;
     }
 
     public void setDrugId(Integer drugId) {
-        DrugId = drugId;
+        this.drugId = drugId;
     }
 
     public String getReginmenLine() {
-        return ReginmenLine;
+        return reginmenLine;
     }
 
     public void setReginmenLine(String reginmenLine) {
-        ReginmenLine = reginmenLine;
+        this.reginmenLine = reginmenLine;
     }
 
     public Integer getPrescriptionId() {
-        return PrescriptionId;
+        return prescriptionId;
     }
 
     public void setPrescriptionId(Integer prescriptionId) {
-        PrescriptionId = prescriptionId;
+        this.prescriptionId = prescriptionId;
     }
 }

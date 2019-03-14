@@ -1,13 +1,12 @@
 package com.harmonycloud.enums;
 
-import org.apache.commons.lang.StringUtils;
 
 public enum ErrorMsgEnum {
 
-
     SERVICE_ERROR("Internal service error"),
     PARAMETER_ERROR("Parameter error"),
-    SAVE_ERROR("Save error");
+    SAVE_ERROR("Save error"),
+    UPDATE_ERROR("Update error");
 
     private String message;
 
