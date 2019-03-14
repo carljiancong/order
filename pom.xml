@@ -82,6 +82,12 @@
             <artifactId>omega-transport-resttemplate</artifactId>
             <version>0.2.1</version>
         </dependency>
+        <!--rocketMQ-->
+        <dependency>
+            <groupId>org.apache.rocketmq</groupId>
+            <artifactId>rocketmq-client</artifactId>
+            <version>4.4.0</version>
+        </dependency>
         <!-- swagger -->
         <dependency>
             <groupId>io.springfox</groupId>

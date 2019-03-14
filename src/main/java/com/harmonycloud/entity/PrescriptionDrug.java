@@ -3,9 +3,8 @@ package com.harmonycloud.entity;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "presciption_drug")
+@Table(name = "prescription_drug")
 public class PrescriptionDrug {
-
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Integer prescriptionDrugId;

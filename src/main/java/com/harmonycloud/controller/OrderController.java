@@ -1,6 +1,6 @@
 package com.harmonycloud.controller;
 
-import com.harmonycloud.dto.PrescriptionDto;
+import com.harmonycloud.bo.PrescriptionBo;
 import com.harmonycloud.bo.PrescriptionDrugBo;
 import com.harmonycloud.enums.ErrorMsgEnum;
 import com.harmonycloud.exception.OrderException;
@@ -41,18 +41,18 @@ public class OrderController {
     /**
      * save medication order by save button
      *
-     * @param dto model
+     * @param bo model
      * @return
      * @throws Exception
      */
     @PostMapping("/saveOrder")
     @ApiOperation(value = "save medication order by save", httpMethod = "POST")
-    @ApiImplicitParam(name = "dto", value = "dto", dataType = "PrescriptionDto")
-    public CimsResponseWrapper<String> saveOrder(@RequestBody PrescriptionDto dto) throws Exception {
-        if (dto == null || dto.getPrescription().getPatientId() <= 0 || dto.getPrescription().getEncounterId() <= 0) {
+    @ApiImplicitParam(name = "bo", value = "bo", dataType = "PrescriptionBo")
+    public CimsResponseWrapper<String> saveOrder(@RequestBody PrescriptionBo bo) throws Exception {
+        if (bo == null || bo.getPrescription().getPatientId() <= 0 || bo.getPrescription().getEncounterId() <= 0) {
             throw new OrderException(ErrorMsgEnum.PARAMETER_ERROR.getMessage());
         }
-        prescriptionService.savePrescription(dto);
+        prescriptionService.savePrescription(bo);
 
         return new CimsResponseWrapper<>(true, null, "Save success");
     }
@@ -71,7 +71,7 @@ public class OrderController {
         if (bo == null || bo.getOldPrescriptionDrugList().get(0).getPrescriptionId() <= 0) {
             throw new OrderException(ErrorMsgEnum.PARAMETER_ERROR.getMessage());
         }
-        prescriptionDrugService.updatePrescriptionDrug(bo);
+        prescriptionService.updatePrescription(bo);
         return new CimsResponseWrapper<>(true, null, "Update success");
     }
 
@@ -79,27 +79,27 @@ public class OrderController {
     /**
      * save medication order by next patient button
      *
-     * @param dto model
+     * @param bo model
      * @return
      * @throws Exception
      */
     @PostMapping(path = "/savePrescription", consumes = MediaType.APPLICATION_JSON_VALUE)
     @Compensable(compensationMethod = "savePrescriptionCancel", timeout = 10)
-    public CimsResponseWrapper<String> savePrescription(@RequestBody PrescriptionDto dto) throws Exception {
-        if (dto == null || dto.getPrescription().getPatientId() <= 0 || dto.getPrescription().getEncounterId() <= 0) {
+    public CimsResponseWrapper<String> savePrescription(@RequestBody PrescriptionBo bo) throws Exception {
+        if (bo == null || bo.getPrescription().getPatientId() <= 0 || bo.getPrescription().getEncounterId() <= 0) {
             throw new OrderException(ErrorMsgEnum.PARAMETER_ERROR.getMessage());
         }
-        prescriptionService.savePrescription(dto);
+        prescriptionService.savePrescription(bo);
         return new CimsResponseWrapper<>(true, null, "Save success");
     }
 
     /**
      * saga:save medication order rollback
      *
-     * @param prescriptionDto model
+     * @param bo model
      */
-    public void savePrescriptionCancel(PrescriptionDto prescriptionDto) throws Exception {
-        prescriptionService.savePrescriptionCancel(prescriptionDto);
+    public void savePrescriptionCancel(PrescriptionBo bo) throws Exception {
+        prescriptionService.savePrescriptionCancel(bo);
     }
 
     /**
@@ -115,7 +115,7 @@ public class OrderController {
         if (bo == null || bo.getOldPrescriptionDrugList().get(0).getPrescriptionId() <= 0) {
             throw new OrderException(ErrorMsgEnum.PARAMETER_ERROR.getMessage());
         }
-        prescriptionDrugService.updatePrescriptionDrug(bo);
+        prescriptionService.updatePrescription(bo);
         return new CimsResponseWrapper<>(true, null, "Update success");
     }
 
@@ -125,7 +125,7 @@ public class OrderController {
      * @throws Exception
      */
     public void updatePrescriptionDrugCancel(PrescriptionDrugBo bo) throws Exception {
-        prescriptionDrugService.updatePrescriptionDrugCancel(bo);
+        prescriptionService.updatePrescriptionCancel(bo);
     }
 
 }
