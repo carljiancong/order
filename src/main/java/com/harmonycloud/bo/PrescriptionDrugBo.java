@@ -1,45 +1,72 @@
 package com.harmonycloud.bo;
 
-import com.harmonycloud.entity.Prescription;
-import com.harmonycloud.entity.PrescriptionDrug;
-
-import java.util.List;
+import javax.persistence.*;
 
 public class PrescriptionDrugBo {
-    private Prescription oldPrescription;
-    private List<PrescriptionDrug> oldPrescriptionDrugList;
-    private List<PrescriptionDrug> newPrescriptionDrugList;
+    private Integer prescriptionDrugId;
+    private Integer drugId;
+    private String drugName;
+    private String ingredient;
+    private String reginmenLine;
+    private Integer prescriptionId;
 
     public PrescriptionDrugBo() {
     }
 
-    public PrescriptionDrugBo(Prescription oldPrescription, List<PrescriptionDrug> oldPrescriptionDrugList, List<PrescriptionDrug> newPrescriptionDrugList) {
-        this.oldPrescription = oldPrescription;
-        this.oldPrescriptionDrugList = oldPrescriptionDrugList;
-        this.newPrescriptionDrugList = newPrescriptionDrugList;
+    public PrescriptionDrugBo(Integer prescriptionDrugId, Integer drugId, String drugName, String ingredient, String reginmenLine, Integer prescriptionId) {
+        this.prescriptionDrugId = prescriptionDrugId;
+        this.drugId = drugId;
+        this.drugName = drugName;
+        this.ingredient = ingredient;
+        this.reginmenLine = reginmenLine;
+        this.prescriptionId = prescriptionId;
     }
 
-    public Prescription getOldPrescription() {
-        return oldPrescription;
+    public String getIngredient() {
+        return ingredient;
     }
 
-    public void setOldPrescription(Prescription oldPrescription) {
-        this.oldPrescription = oldPrescription;
+    public void setIngredient(String ingredient) {
+        this.ingredient = ingredient;
     }
 
-    public List<PrescriptionDrug> getOldPrescriptionDrugList() {
-        return oldPrescriptionDrugList;
+    public Integer getPrescriptionDrugId() {
+        return prescriptionDrugId;
     }
 
-    public void setOldPrescriptionDrugList(List<PrescriptionDrug> oldPrescriptionDrugList) {
-        this.oldPrescriptionDrugList = oldPrescriptionDrugList;
+    public void setPrescriptionDrugId(Integer prescriptionDrugId) {
+        this.prescriptionDrugId = prescriptionDrugId;
     }
 
-    public List<PrescriptionDrug> getNewPrescriptionDrugList() {
-        return newPrescriptionDrugList;
+    public Integer getDrugId() {
+        return drugId;
     }
 
-    public void setNewPrescriptionDrugList(List<PrescriptionDrug> newPrescriptionDrugList) {
-        this.newPrescriptionDrugList = newPrescriptionDrugList;
+    public void setDrugId(Integer drugId) {
+        this.drugId = drugId;
+    }
+
+    public String getReginmenLine() {
+        return reginmenLine;
+    }
+
+    public void setReginmenLine(String reginmenLine) {
+        this.reginmenLine = reginmenLine;
+    }
+
+    public Integer getPrescriptionId() {
+        return prescriptionId;
+    }
+
+    public void setPrescriptionId(Integer prescriptionId) {
+        this.prescriptionId = prescriptionId;
+    }
+
+    public String getDrugName() {
+        return drugName;
+    }
+
+    public void setDrugName(String drugName) {
+        this.drugName = drugName;
     }
 }

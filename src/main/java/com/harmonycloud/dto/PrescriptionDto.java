@@ -1,18 +1,18 @@
-package com.harmonycloud.bo;
+package com.harmonycloud.dto;
 
 import com.harmonycloud.entity.Prescription;
 import com.harmonycloud.entity.PrescriptionDrug;
 
 import java.util.List;
 
-public class PrescriptionBo {
+public class PrescriptionDto {
     private Prescription prescription;
     private List<PrescriptionDrug> prescriptionDrugList;
 
-    public PrescriptionBo() {
+    public PrescriptionDto() {
     }
 
-    public PrescriptionBo(Prescription prescription, List<PrescriptionDrug> prescriptionDrugList) {
+    public PrescriptionDto(Prescription prescription, List<PrescriptionDrug> prescriptionDrugList) {
         this.prescription = prescription;
         this.prescriptionDrugList = prescriptionDrugList;
     }

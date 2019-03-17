@@ -1,7 +1,9 @@
 package com.harmonycloud.service;
 
 import com.harmonycloud.bo.PrescriptionDrugBo;
-import com.harmonycloud.bo.PrescriptionBo;
+import com.harmonycloud.dto.DrugHistory;
+import com.harmonycloud.dto.PrescriptionDrugDto;
+import com.harmonycloud.dto.PrescriptionDto;
 import com.harmonycloud.bo.UserPrincipal;
 import com.harmonycloud.entity.Prescription;
 import com.harmonycloud.entity.PrescriptionDrug;
@@ -29,14 +31,14 @@ public class PrescriptionService {
     /**
      * save prescription
      *
-     * @param prescriptionBo model
+     * @param prescriptionDto model
      * @return
      * @throws Exception
      */
     @Transactional(rollbackFor = Exception.class)
-    public CimsResponseWrapper<String> savePrescription(PrescriptionBo prescriptionBo) throws Exception {
-        Prescription prescription = prescriptionBo.getPrescription();
-        List<PrescriptionDrug> prescriptionDrugList = prescriptionBo.getPrescriptionDrugList();
+    public CimsResponseWrapper<String> savePrescription(PrescriptionDto prescriptionDto) throws Exception {
+        Prescription prescription = prescriptionDto.getPrescription();
+        List<PrescriptionDrug> prescriptionDrugList = prescriptionDto.getPrescriptionDrugList();
         UserPrincipal userDetails = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         prescription.setCreateBy(userDetails.getUsername());
@@ -46,9 +48,10 @@ public class PrescriptionService {
         if (prescriptionRepository.save(prescription).getPrescriptionId() == null) {
             throw new OrderException(ErrorMsgEnum.SAVE_ERROR.getMessage());
         }
-
-        // save prescriptionDrug
-        prescriptionDrugService.savePrescriptionDrug(prescriptionDrugList, prescription.getPrescriptionId());
+        if (prescriptionDrugList.size() != 0) {
+            // save prescriptionDrug
+            prescriptionDrugService.savePrescriptionDrug(prescriptionDrugList, prescription.getPrescriptionId());
+        }
 
         return new CimsResponseWrapper<>(true, null, "Save success");
     }
@@ -56,29 +59,33 @@ public class PrescriptionService {
     /**
      * saga:save prescription rollback
      *
-     * @param prescriptionBo model
+     * @param prescriptionDto model
      */
     @Transactional(rollbackFor = Exception.class)
-    public void savePrescriptionCancel(PrescriptionBo prescriptionBo) throws Exception{
+    public void savePrescriptionCancel(PrescriptionDto prescriptionDto) throws Exception {
         //delete prescription
-        Integer EncounterId = prescriptionBo.getPrescription().getEncounterId();
+        Integer EncounterId = prescriptionDto.getPrescription().getEncounterId();
         Prescription prescription = prescriptionRepository.findByEncounterId(EncounterId);
         prescriptionRepository.delete(prescription);
 
         //delete prescriptionDrug
-        prescriptionDrugService.savePrescriptionDrugCancel(prescription.getPrescriptionId());
+        List<PrescriptionDrug> prescriptionDrugList = prescriptionDto.getPrescriptionDrugList();
+        if (prescriptionDrugList.size() != 0) {
+            prescriptionDrugService.savePrescriptionDrugCancel(prescription.getPrescriptionId());
+        }
     }
 
     /**
      * update prescription
      *
-     * @param prescriptionDrugBo
+     * @param prescriptionDrugDto
      * @return
      * @throws Exception
      */
     @Transactional(rollbackFor = Exception.class)
-    public CimsResponseWrapper<String> updatePrescription(PrescriptionDrugBo prescriptionDrugBo) throws Exception {
-        Prescription prescription = prescriptionDrugBo.getOldPrescription();
+    public CimsResponseWrapper<String> updatePrescription(PrescriptionDrugDto prescriptionDrugDto) throws Exception {
+        //抛错!!!!!!
+        Prescription prescription = prescriptionRepository.findByEncounterId(prescriptionDrugDto.getOldPrescription().getEncounterId());
         UserPrincipal userDetails = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         prescription.setCreateBy(userDetails.getUsername());
@@ -87,23 +94,64 @@ public class PrescriptionService {
         // update prescription
         prescriptionRepository.save(prescription);
         // update prescription_drug
-        prescriptionDrugService.updatePrescriptionDrug(prescriptionDrugBo);
+        if (prescriptionDrugDto.getNewPrescriptionDrugList().size() != 0) {
+            prescriptionDrugService.updatePrescriptionDrug(prescriptionDrugDto);
+        }
 
         return new CimsResponseWrapper<String>(true, null, "Update  success");
     }
 
-    public void updatePrescriptionCancel(PrescriptionDrugBo prescriptionDrugBo) throws Exception {
-        Prescription prescription = prescriptionDrugBo.getOldPrescription();
+    /**
+     * saga: update prescription rollback
+     *
+     * @param prescriptionDrugDto
+     * @throws Exception
+     */
+    public void updatePrescriptionCancel(PrescriptionDrugDto prescriptionDrugDto) throws Exception {
+
+        Prescription prescription = prescriptionDrugDto.getOldPrescription();
+        prescription.setPrescriptionId(prescriptionRepository.findByEncounterId(prescriptionDrugDto.getOldPrescription().getEncounterId()).getPrescriptionId());
 
         prescriptionRepository.save(prescription);
-
-        prescriptionDrugService.updatePrescriptionDrugCancel(prescriptionDrugBo);
+        if (prescriptionDrugDto.getNewPrescriptionDrugList().size() != 0) {
+            prescriptionDrugService.updatePrescriptionDrugCancel(prescriptionDrugDto);
+        }
 
     }
 
+    /**
+     * get drug history
+     *
+     * @param patientId patientId
+     * @return
+     * @throws Exception
+     */
     public CimsResponseWrapper<List> listDrugHistory(Integer patientId) throws Exception {
         List<Prescription> prescriptionList = prescriptionRepository.findByPatientId(patientId);
-        return new CimsResponseWrapper<List>(true, null, prescriptionList);
+        List<DrugHistory> drugHistoryList = null;
+        for (int i = 0; i < prescriptionList.size(); i++) {
+            List<PrescriptionDrugBo> prescriptionDrugBoList = prescriptionDrugService.listPrescriptionDrug(prescriptionList.get(i).getPrescriptionId());
+            DrugHistory drugHistory = new DrugHistory(prescriptionList.get(i), prescriptionDrugBoList);
+            drugHistoryList.add(drugHistory);
+        }
+
+        return new CimsResponseWrapper<List>(true, null, drugHistoryList);
     }
+
+
+    /**
+     * get patient prescription and prescription_drug in this encounter
+     *
+     * @param encounterId encounterId
+     * @return
+     * @throws Exception
+     */
+    public CimsResponseWrapper<DrugHistory> getPrescription(Integer encounterId) throws Exception {
+        Prescription prescription = prescriptionRepository.findByEncounterId(encounterId);
+        List<PrescriptionDrugBo> prescriptionDrugBoList = prescriptionDrugService.listPrescriptionDrug(prescription.getPrescriptionId());
+        DrugHistory drugHistory = new DrugHistory(prescription, prescriptionDrugBoList);
+        return new CimsResponseWrapper<DrugHistory>(true, null, drugHistory);
+    }
+
 
 }

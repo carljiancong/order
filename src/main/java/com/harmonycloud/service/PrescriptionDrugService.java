@@ -2,17 +2,20 @@ package com.harmonycloud.service;
 
 import com.alibaba.fastjson.JSONObject;
 import com.harmonycloud.bo.PrescriptionDrugBo;
+import com.harmonycloud.bo.UserPrincipal;
+import com.harmonycloud.config.OrderConfigurationProperties;
+import com.harmonycloud.dto.PrescriptionDrugDto;
+import com.harmonycloud.entity.Drug;
 import com.harmonycloud.entity.PrescriptionDrug;
 import com.harmonycloud.enums.ErrorMsgEnum;
 import com.harmonycloud.exception.OrderException;
 import com.harmonycloud.repository.PrescriptionDrugRepository;
 import com.harmonycloud.result.CimsResponseWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class PrescriptionDrugService {
@@ -20,6 +23,11 @@ public class PrescriptionDrugService {
     private PrescriptionDrugRepository prescriptionDrugRepository;
     @Autowired
     private RocketMqService rocketMqService;
+    @Autowired
+    private SyncService syncService;
+
+    @Autowired
+    private OrderConfigurationProperties config;
 
     /**
      * save prescription_drug
@@ -82,12 +90,12 @@ public class PrescriptionDrugService {
     /**
      * update prescription_drug
      *
-     * @param prescriptionDrugBo model
+     * @param prescriptionDrugDto model
      * @return
      */
-    public CimsResponseWrapper<String> updatePrescriptionDrug(PrescriptionDrugBo prescriptionDrugBo) throws Exception {
-        List<PrescriptionDrug> oldPrescriptionDrugList = prescriptionDrugBo.getOldPrescriptionDrugList();
-        List<PrescriptionDrug> newPrescriptionDrugList = prescriptionDrugBo.getNewPrescriptionDrugList();
+    public CimsResponseWrapper<String> updatePrescriptionDrug(PrescriptionDrugDto prescriptionDrugDto) throws Exception {
+        List<PrescriptionDrug> oldPrescriptionDrugList = prescriptionDrugDto.getOldPrescriptionDrugList();
+        List<PrescriptionDrug> newPrescriptionDrugList = prescriptionDrugDto.getNewPrescriptionDrugList();
 
         prescriptionDrugRepository.deleteAll(oldPrescriptionDrugList);
 
@@ -117,7 +125,7 @@ public class PrescriptionDrugService {
 
         //send message
         if (oldJson.containsKey("314") || oldJson.containsKey("316") || newJson.containsKey("314") || newJson.containsKey("316")) {
-            rocketMqService.sendMsg("OrderTopicUpdate", "OrderPushUpdate", getInfo((newJson.getIntValue("314") - oldJson.getIntValue("314")), (newJson.getIntValue("316") - oldJson.getIntValue("316"))));
+            rocketMqService.sendMsg("OrderTopic", "OrderPush", getInfo((newJson.getIntValue("314") - oldJson.getIntValue("314")), (newJson.getIntValue("316") - oldJson.getIntValue("316"))));
         }
         return new CimsResponseWrapper<String>(true, null, "Update  success");
     }
@@ -126,10 +134,10 @@ public class PrescriptionDrugService {
     /**
      * saga:update Prescription_drug rollback
      *
-     * @param prescriptionDrugBo model
+     * @param prescriptionDrugDto model
      */
-    public void updatePrescriptionDrugCancel(PrescriptionDrugBo prescriptionDrugBo) throws Exception {
-        List<PrescriptionDrug> oldPrescriptionDrugList = prescriptionDrugBo.getOldPrescriptionDrugList();
+    public void updatePrescriptionDrugCancel(PrescriptionDrugDto prescriptionDrugDto) throws Exception {
+        List<PrescriptionDrug> oldPrescriptionDrugList = prescriptionDrugDto.getOldPrescriptionDrugList();
         List<PrescriptionDrug> PrescriptionDrugList = prescriptionDrugRepository.findByPrescriptionId(oldPrescriptionDrugList.get(0).getPrescriptionId());
         prescriptionDrugRepository.deleteAll(PrescriptionDrugList);
         prescriptionDrugRepository.saveAll(oldPrescriptionDrugList);
@@ -152,8 +160,42 @@ public class PrescriptionDrugService {
         });
 
         if (oldJson.containsKey("314") || oldJson.containsKey("316") || newJson.containsKey("314") || newJson.containsKey("316")) {
-            rocketMqService.sendMsg("OrderTopicUpdate", "OrderPushUpdate", "saga:" + getInfo((oldJson.getIntValue("314") - newJson.getIntValue("314")), (oldJson.getIntValue("316") - newJson.getIntValue("316"))));
+            rocketMqService.sendMsg("OrderTopic", "OrderPush", "saga:" + getInfo((oldJson.getIntValue("314") - newJson.getIntValue("314")), (oldJson.getIntValue("316") - newJson.getIntValue("316"))));
         }
+    }
+
+    /**
+     * get PrescriptionDrugBoList
+     *
+     * @param prescriptionId prescriptionId
+     * @return
+     * @throws Exception
+     */
+    public List<PrescriptionDrugBo> listPrescriptionDrug(Integer prescriptionId) throws Exception {
+        UserPrincipal userDetails = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal();
+        String token = userDetails.getToken();
+        List<PrescriptionDrug> prescriptionDrugList = prescriptionDrugRepository.findByPrescriptionId(prescriptionId);
+        List<PrescriptionDrugBo> prescriptionDrugBoList = null;
+        Integer[] drugIdList = new Integer[prescriptionDrugList.size()];
+
+        for (int i = 0; i < prescriptionDrugList.size(); i++) {
+            drugIdList[i] = prescriptionDrugList.get(i).getDrugId();
+        }
+        List<Drug> drugList = syncService.save(config.getDrugUri(), token, drugIdList).getDurgList();
+
+
+        prescriptionDrugList.forEach(prescriptionDrug -> {
+            drugList.forEach(drug -> {
+                if (prescriptionDrug.getDrugId() == drug.getDrugId()) {
+                    PrescriptionDrugBo prescriptionDrugBo = new PrescriptionDrugBo(prescriptionDrug.getPrescriptionDrugId(), prescriptionDrug.getDrugId(),
+                            drug.getTradeName(), drug.getIngredient(), prescriptionDrug.getReginmenLine(), prescriptionId);
+                    prescriptionDrugBoList.add(prescriptionDrugBo);
+                }
+            });
+        });
+        return prescriptionDrugBoList;
+
     }
 
     private String getInfo(int juniorNum, int adultNum) {

@@ -7,7 +7,7 @@ import java.util.Date;
 public class Aduit {
     private Date date;
     private String severityCD;
-    private String Workstation;
+    private String workstation;
     private String clientIp;
     private Integer userId;
     private String projectCode;
@@ -21,7 +21,7 @@ public class Aduit {
     public Aduit(Date date, String severityCD, String workstation, String clientIp, Integer userId, String projectCode, String correlationId, String applicationName, String infomation) {
         this.date = date;
         this.severityCD = severityCD;
-        Workstation = workstation;
+        this.workstation = workstation;
         this.clientIp = clientIp;
         this.userId = userId;
         this.projectCode = projectCode;
@@ -55,11 +55,11 @@ public class Aduit {
     }
 
     public String getWorkstation() {
-        return Workstation;
+        return workstation;
     }
 
     public void setWorkstation(String workstation) {
-        Workstation = workstation;
+        this.workstation = workstation;
     }
 
     public Integer getUserId() {

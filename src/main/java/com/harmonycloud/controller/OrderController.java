@@ -1,7 +1,8 @@
 package com.harmonycloud.controller;
 
-import com.harmonycloud.bo.PrescriptionBo;
-import com.harmonycloud.bo.PrescriptionDrugBo;
+import com.harmonycloud.dto.DrugHistory;
+import com.harmonycloud.dto.PrescriptionDto;
+import com.harmonycloud.dto.PrescriptionDrugDto;
 import com.harmonycloud.enums.ErrorMsgEnum;
 import com.harmonycloud.exception.OrderException;
 import com.harmonycloud.result.CimsResponseWrapper;
@@ -27,7 +28,13 @@ public class OrderController {
     @Autowired
     private PrescriptionDrugService prescriptionDrugService;
 
-
+    /**
+     * list drug history
+     *
+     * @param patientId patientId
+     * @return
+     * @throws Exception
+     */
     @GetMapping("/drugHistory")
     @ApiOperation(value = "patient drug history", httpMethod = "GET")
     @ApiImplicitParam(name = "patientId", value = "patientId", paramType = "query", dataType = "Integer")
@@ -39,20 +46,37 @@ public class OrderController {
     }
 
     /**
+     * get patient prescription in this enocunter
+     *
+     * @param enocunterId
+     * @return
+     * @throws Exception
+     */
+    @GetMapping("/getPrescription")
+    @ApiOperation(value = "get prescription  by enocunterId", httpMethod = "GET")
+    @ApiImplicitParam(name = "encounterId", value = "encounterId", paramType = "query", dataType = "Integer")
+    public CimsResponseWrapper<DrugHistory> getPrescription(@RequestParam("enocunterId") Integer enocunterId) throws Exception {
+        if (enocunterId == null || enocunterId <= 0) {
+            throw new OrderException(ErrorMsgEnum.PARAMETER_ERROR.getMessage());
+        }
+        return prescriptionService.getPrescription(enocunterId);
+    }
+
+    /**
      * save medication order by save button
      *
-     * @param bo model
+     * @param dto model
      * @return
      * @throws Exception
      */
     @PostMapping("/saveOrder")
     @ApiOperation(value = "save medication order by save", httpMethod = "POST")
-    @ApiImplicitParam(name = "bo", value = "bo", dataType = "PrescriptionBo")
-    public CimsResponseWrapper<String> saveOrder(@RequestBody PrescriptionBo bo) throws Exception {
-        if (bo == null || bo.getPrescription().getPatientId() <= 0 || bo.getPrescription().getEncounterId() <= 0) {
+    @ApiImplicitParam(name = "dto", value = "dto", dataType = "PrescriptionDto")
+    public CimsResponseWrapper<String> saveOrder(@RequestBody PrescriptionDto dto) throws Exception {
+        if (dto == null || dto.getPrescription().getPatientId() <= 0 || dto.getPrescription().getEncounterId() <= 0) {
             throw new OrderException(ErrorMsgEnum.PARAMETER_ERROR.getMessage());
         }
-        prescriptionService.savePrescription(bo);
+        prescriptionService.savePrescription(dto);
 
         return new CimsResponseWrapper<>(true, null, "Save success");
     }
@@ -60,18 +84,18 @@ public class OrderController {
     /**
      * update medication order by save button
      *
-     * @param bo model
+     * @param dto model
      * @return
      * @throws Exception
      */
     @PostMapping("/updateOrder")
     @ApiOperation(value = "update medication order by save", httpMethod = "POST")
-    @ApiImplicitParam(name = "bo", value = "bo", dataType = "PrescriptionDrugBo")
-    public CimsResponseWrapper<String> updateOrder(@RequestBody PrescriptionDrugBo bo) throws Exception {
-        if (bo == null || bo.getOldPrescriptionDrugList().get(0).getPrescriptionId() <= 0) {
+    @ApiImplicitParam(name = "dto", value = "dto", dataType = "PrescriptionDrugDto")
+    public CimsResponseWrapper<String> updateOrder(@RequestBody PrescriptionDrugDto dto) throws Exception {
+        if (dto == null || dto.getOldPrescriptionDrugList().get(0).getPrescriptionId() <= 0) {
             throw new OrderException(ErrorMsgEnum.PARAMETER_ERROR.getMessage());
         }
-        prescriptionService.updatePrescription(bo);
+        prescriptionService.updatePrescription(dto);
         return new CimsResponseWrapper<>(true, null, "Update success");
     }
 
@@ -79,53 +103,54 @@ public class OrderController {
     /**
      * save medication order by next patient button
      *
-     * @param bo model
+     * @param dto model
      * @return
      * @throws Exception
      */
     @PostMapping(path = "/savePrescription", consumes = MediaType.APPLICATION_JSON_VALUE)
     @Compensable(compensationMethod = "savePrescriptionCancel", timeout = 10)
-    public CimsResponseWrapper<String> savePrescription(@RequestBody PrescriptionBo bo) throws Exception {
-        if (bo == null || bo.getPrescription().getPatientId() <= 0 || bo.getPrescription().getEncounterId() <= 0) {
+    public CimsResponseWrapper<String> savePrescription(@RequestBody PrescriptionDto dto) throws Exception {
+        if (dto == null || dto.getPrescription().getPatientId() <= 0 || dto.getPrescription().getEncounterId() <= 0) {
             throw new OrderException(ErrorMsgEnum.PARAMETER_ERROR.getMessage());
         }
-        prescriptionService.savePrescription(bo);
+        prescriptionService.savePrescription(dto);
         return new CimsResponseWrapper<>(true, null, "Save success");
     }
 
     /**
      * saga:save medication order rollback
      *
-     * @param bo model
+     * @param dto model
      */
-    public void savePrescriptionCancel(PrescriptionBo bo) throws Exception {
-        prescriptionService.savePrescriptionCancel(bo);
+    public void savePrescriptionCancel(PrescriptionDto dto) throws Exception {
+        prescriptionService.savePrescriptionCancel(dto);
     }
 
     /**
      * update medication order by next patient button
      *
-     * @param bo model
+     * @param dto model
      * @return
      * @throws Exception
      */
     @PostMapping("/updatePrescription")
-    @Compensable(compensationMethod = "updatePrescriptionDrugCancel", timeout = 10)
-    public CimsResponseWrapper<String> updatePrescription(@RequestBody PrescriptionDrugBo bo) throws Exception {
-        if (bo == null || bo.getOldPrescriptionDrugList().get(0).getPrescriptionId() <= 0) {
+    @Compensable(compensationMethod = "updatePrescriptionDrugCancel", timeout = 5)
+    public CimsResponseWrapper<String> updatePrescription(@RequestBody PrescriptionDrugDto dto) throws Exception {
+        if (dto == null ) {
             throw new OrderException(ErrorMsgEnum.PARAMETER_ERROR.getMessage());
         }
-        prescriptionService.updatePrescription(bo);
+        prescriptionService.updatePrescription(dto);
         return new CimsResponseWrapper<>(true, null, "Update success");
     }
 
     /**
      * saga:update medication order rollback
-     * @param bo model
+     *
+     * @param dto model
      * @throws Exception
      */
-    public void updatePrescriptionDrugCancel(PrescriptionDrugBo bo) throws Exception {
-        prescriptionService.updatePrescriptionCancel(bo);
+    public void updatePrescriptionDrugCancel(PrescriptionDrugDto dto) throws Exception {
+        prescriptionService.updatePrescriptionCancel(dto);
     }
 
 }
