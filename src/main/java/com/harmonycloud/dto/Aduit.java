@@ -21,7 +21,7 @@ public class Aduit {
     public Aduit(Date date, String severityCD, String workstation, String clientIp, Integer userId, String projectCode, String correlationId, String applicationName, String infomation) {
         this.date = date;
         this.severityCD = severityCD;
-        this.workstation = workstation;
+        workstation = workstation;
         this.clientIp = clientIp;
         this.userId = userId;
         this.projectCode = projectCode;
@@ -59,7 +59,7 @@ public class Aduit {
     }
 
     public void setWorkstation(String workstation) {
-        this.workstation = workstation;
+        workstation = workstation;
     }
 
     public Integer getUserId() {
