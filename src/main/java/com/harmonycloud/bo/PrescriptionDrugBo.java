@@ -5,7 +5,7 @@ import javax.persistence.*;
 public class PrescriptionDrugBo {
     private Integer prescriptionDrugId;
     private Integer drugId;
-    private String drugName;
+    private String tradeName;
     private String ingredient;
     private String regimenLine;
     private Integer prescriptionId;
@@ -13,10 +13,10 @@ public class PrescriptionDrugBo {
     public PrescriptionDrugBo() {
     }
 
-    public PrescriptionDrugBo(Integer prescriptionDrugId, Integer drugId, String drugName, String ingredient, String regimenLine, Integer prescriptionId) {
+    public PrescriptionDrugBo(Integer prescriptionDrugId, Integer drugId, String tradeName, String ingredient, String regimenLine, Integer prescriptionId) {
         this.prescriptionDrugId = prescriptionDrugId;
         this.drugId = drugId;
-        this.drugName = drugName;
+        this.tradeName = tradeName;
         this.ingredient = ingredient;
         this.regimenLine = regimenLine;
         this.prescriptionId = prescriptionId;
@@ -62,11 +62,11 @@ public class PrescriptionDrugBo {
         this.prescriptionId = prescriptionId;
     }
 
-    public String getDrugName() {
-        return drugName;
+    public String getTradeName() {
+        return tradeName;
     }
 
-    public void setDrugName(String drugName) {
-        this.drugName = drugName;
+    public void setTradeName(String tradeName) {
+        this.tradeName = tradeName;
     }
 }

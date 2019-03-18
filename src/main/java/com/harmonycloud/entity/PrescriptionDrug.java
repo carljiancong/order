@@ -12,7 +12,7 @@ public class PrescriptionDrug {
     private Integer drugId;
     @Column(name = "regimen_line")
     private String regimenLine;
-    @Column(name = "prescripttion_id")
+    @Column(name = "prescription_id")
     private Integer prescriptionId;
 
     public PrescriptionDrug() {
