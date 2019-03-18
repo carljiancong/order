@@ -5,6 +5,7 @@ import com.harmonycloud.bo.PrescriptionDrugBo;
 import com.harmonycloud.bo.UserPrincipal;
 import com.harmonycloud.config.OrderConfigurationProperties;
 import com.harmonycloud.dto.PrescriptionDrugDto;
+import com.harmonycloud.entity.Drug;
 import com.harmonycloud.entity.PrescriptionDrug;
 import com.harmonycloud.enums.ErrorMsgEnum;
 import com.harmonycloud.exception.OrderException;
@@ -185,17 +186,16 @@ public class PrescriptionDrugService {
             for (int i = 0; i < prescriptionDrugList.size(); i++) {
                 drugIdList[i] = prescriptionDrugList.get(i).getDrugId();
             }
+            //get drug list
             Object test = syncService.save(config.getDrugUri(), token, drugIdList).getReturnObject();
-            List<Map> tmp = (List<Map>) test;
+
+            Map<Integer, Map> tmp = (Map<Integer, Map>) test;
 
             prescriptionDrugList.forEach(prescriptionDrug -> {
-                tmp.forEach(drug -> {
-                    if (prescriptionDrug.getDrugId() == drug.get("drugId")) {
-                        PrescriptionDrugBo prescriptionDrugBo = new PrescriptionDrugBo(prescriptionDrug.getPrescriptionDrugId(), prescriptionDrug.getDrugId(),
-                                drug.get("tradeName").toString(), drug.get("ingredient").toString(), prescriptionDrug.getReginmenLine(), prescriptionId);
-                        prescriptionDrugBoList.add(prescriptionDrugBo);
-                    }
-                });
+                Map<String, Object> drug = tmp.get(prescriptionDrug.getDrugId().toString());
+                PrescriptionDrugBo prescriptionDrugBo = new PrescriptionDrugBo(prescriptionDrug.getPrescriptionDrugId(), prescriptionDrug.getDrugId(),
+                        drug.get("tradeName").toString(), drug.get("ingredient").toString(), prescriptionDrug.getReginmenLine(), prescriptionId);
+                prescriptionDrugBoList.add(prescriptionDrugBo);
             });
             return prescriptionDrugBoList;
         } else {
