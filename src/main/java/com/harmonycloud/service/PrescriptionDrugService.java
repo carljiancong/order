@@ -94,14 +94,15 @@ public class PrescriptionDrugService {
      * @param prescriptionDrugDto model
      * @return
      */
-    public CimsResponseWrapper<String> updatePrescriptionDrug(PrescriptionDrugDto prescriptionDrugDto) throws Exception {
+    public CimsResponseWrapper<String> updatePrescriptionDrug(PrescriptionDrugDto prescriptionDrugDto, Integer prescriptionId) throws Exception {
         List<PrescriptionDrug> oldPrescriptionDrugList = prescriptionDrugDto.getOldPrescriptionDrugList();
         List<PrescriptionDrug> newPrescriptionDrugList = prescriptionDrugDto.getNewPrescriptionDrugList();
-
-        prescriptionDrugRepository.deleteAll(oldPrescriptionDrugList);
+        if (oldPrescriptionDrugList.size() != 0) {
+            prescriptionDrugRepository.deleteAll(oldPrescriptionDrugList);
+        }
 
         for (int i = 0; i < newPrescriptionDrugList.size(); i++) {
-            newPrescriptionDrugList.get(i).setPrescriptionId(oldPrescriptionDrugList.get(0).getPrescriptionId());
+            newPrescriptionDrugList.get(i).setPrescriptionId(prescriptionId);
             if (prescriptionDrugRepository.save(newPrescriptionDrugList.get(i)).getPrescriptionDrugId() == null) {
                 throw new OrderException(ErrorMsgEnum.UPDATE_ERROR.getMessage());
             }
@@ -137,11 +138,13 @@ public class PrescriptionDrugService {
      *
      * @param prescriptionDrugDto model
      */
-    public void updatePrescriptionDrugCancel(PrescriptionDrugDto prescriptionDrugDto) throws Exception {
+    public void updatePrescriptionDrugCancel(PrescriptionDrugDto prescriptionDrugDto, Integer prescriptionId) throws Exception {
         List<PrescriptionDrug> oldPrescriptionDrugList = prescriptionDrugDto.getOldPrescriptionDrugList();
-        List<PrescriptionDrug> PrescriptionDrugList = prescriptionDrugRepository.findByPrescriptionId(oldPrescriptionDrugList.get(0).getPrescriptionId());
-        prescriptionDrugRepository.deleteAll(PrescriptionDrugList);
-        prescriptionDrugRepository.saveAll(oldPrescriptionDrugList);
+        List<PrescriptionDrug> PrescriptionDrugList = prescriptionDrugRepository.findByPrescriptionId(prescriptionId);
+        if (oldPrescriptionDrugList.size() != 0)
+            prescriptionDrugRepository.deleteAll(PrescriptionDrugList);
+        if (PrescriptionDrugList.size() != 0)
+            prescriptionDrugRepository.saveAll(oldPrescriptionDrugList);
 
         JSONObject oldJson = new JSONObject();
         JSONObject newJson = new JSONObject();

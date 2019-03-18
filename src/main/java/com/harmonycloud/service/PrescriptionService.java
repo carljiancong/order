@@ -86,7 +86,7 @@ public class PrescriptionService {
      */
     @Transactional(rollbackFor = Exception.class)
     public CimsResponseWrapper<String> updatePrescription(PrescriptionDrugDto prescriptionDrugDto) throws Exception {
-        //抛错!!!!!!
+
         Prescription prescription = prescriptionRepository.findByEncounterId(prescriptionDrugDto.getOldPrescription().getEncounterId());
         UserPrincipal userDetails = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
@@ -97,7 +97,7 @@ public class PrescriptionService {
         prescriptionRepository.save(prescription);
         // update prescription_drug
         if (prescriptionDrugDto.getNewPrescriptionDrugList().size() != 0) {
-            prescriptionDrugService.updatePrescriptionDrug(prescriptionDrugDto);
+            prescriptionDrugService.updatePrescriptionDrug(prescriptionDrugDto,prescription.getPrescriptionId());
         }
 
         return new CimsResponseWrapper<String>(true, null, "Update  success");
@@ -116,7 +116,7 @@ public class PrescriptionService {
 
         prescriptionRepository.save(prescription);
         if (prescriptionDrugDto.getNewPrescriptionDrugList().size() != 0) {
-            prescriptionDrugService.updatePrescriptionDrugCancel(prescriptionDrugDto);
+            prescriptionDrugService.updatePrescriptionDrugCancel(prescriptionDrugDto,prescription.getPrescriptionId());
         }
 
     }

@@ -89,7 +89,7 @@ public class OrderController {
     @ApiOperation(value = "update medication order by save", httpMethod = "POST")
     @ApiImplicitParam(name = "dto", value = "dto", dataType = "PrescriptionDrugDto")
     public CimsResponseWrapper<String> updateOrder(@RequestBody PrescriptionDrugDto dto) throws Exception {
-        if (dto == null || dto.getOldPrescriptionDrugList().get(0).getPrescriptionId() <= 0) {
+        if (dto == null) {
             throw new OrderException(ErrorMsgEnum.PARAMETER_ERROR.getMessage());
         }
         prescriptionService.updatePrescription(dto);

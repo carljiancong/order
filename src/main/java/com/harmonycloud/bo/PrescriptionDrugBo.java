@@ -7,18 +7,18 @@ public class PrescriptionDrugBo {
     private Integer drugId;
     private String drugName;
     private String ingredient;
-    private String reginmenLine;
+    private String regimenLine;
     private Integer prescriptionId;
 
     public PrescriptionDrugBo() {
     }
 
-    public PrescriptionDrugBo(Integer prescriptionDrugId, Integer drugId, String drugName, String ingredient, String reginmenLine, Integer prescriptionId) {
+    public PrescriptionDrugBo(Integer prescriptionDrugId, Integer drugId, String drugName, String ingredient, String regimenLine, Integer prescriptionId) {
         this.prescriptionDrugId = prescriptionDrugId;
         this.drugId = drugId;
         this.drugName = drugName;
         this.ingredient = ingredient;
-        this.reginmenLine = reginmenLine;
+        this.regimenLine = regimenLine;
         this.prescriptionId = prescriptionId;
     }
 
@@ -46,12 +46,12 @@ public class PrescriptionDrugBo {
         this.drugId = drugId;
     }
 
-    public String getReginmenLine() {
-        return reginmenLine;
+    public String getRegimenLine() {
+        return regimenLine;
     }
 
-    public void setReginmenLine(String reginmenLine) {
-        this.reginmenLine = reginmenLine;
+    public void setRegimenLine(String regimenLine) {
+        this.regimenLine = regimenLine;
     }
 
     public Integer getPrescriptionId() {
