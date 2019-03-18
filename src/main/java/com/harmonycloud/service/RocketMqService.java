@@ -1,10 +1,9 @@
 package com.harmonycloud.service;
 
 import com.harmonycloud.bo.UserPrincipal;
-import com.harmonycloud.dto.Aduit;
+import com.harmonycloud.dto.Audit;
 import com.harmonycloud.enums.ErrorMsgEnum;
 import com.harmonycloud.exception.OrderException;
-import com.harmonycloud.result.CimsResponseWrapper;
 import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
 import org.apache.rocketmq.client.producer.SendResult;
@@ -19,8 +18,6 @@ import javax.annotation.PostConstruct;
 import java.net.InetAddress;
 import java.util.Date;
 import java.util.UUID;
-
-import static org.apache.rocketmq.client.producer.SendStatus.SEND_OK;
 
 
 @Service
@@ -57,10 +54,11 @@ public class RocketMqService {
         for (int i = 0; i < 10; i++) {
             uuid = UUID.randomUUID().toString().replaceAll("-", "");
         }
-        Aduit aduit = new Aduit(new Date(), "Critical", "Computer", InetAddress.getLocalHost().getHostAddress(),
+        Audit audit = new Audit(new Date(), "Critical", "Computer", InetAddress.getLocalHost().getHostAddress(),
                 userDetails.getId(), "CIMS", uuid, "MedicationOrder", information);
 
-        Message message = new Message(topic, tags, aduit.toString().getBytes());
+
+        Message message = new Message(topic, tags, audit.toString().getBytes());
         StopWatch stop = new StopWatch();
         stop.start();
         SendResult result = producer.send(message);

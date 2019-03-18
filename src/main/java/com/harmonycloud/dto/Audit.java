@@ -2,7 +2,7 @@ package com.harmonycloud.dto;
 
 import java.util.Date;
 
-public class Aduit {
+public class Audit {
     private Date date;
     private String severityCD;
     private String workstation;
@@ -13,10 +13,10 @@ public class Aduit {
     private String applicationName;
     private String infomation;
 
-    public Aduit() {
+    public Audit() {
     }
 
-    public Aduit(Date date, String severityCD, String workstation, String clientIp, Integer userId, String projectCode, String correlationId, String applicationName, String infomation) {
+    public Audit(Date date, String severityCD, String workstation, String clientIp, Integer userId, String projectCode, String correlationId, String applicationName, String infomation) {
         this.date = date;
         this.severityCD = severityCD;
         this.workstation = workstation;

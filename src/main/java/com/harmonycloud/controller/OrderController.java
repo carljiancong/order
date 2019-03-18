@@ -6,7 +6,6 @@ import com.harmonycloud.dto.PrescriptionDrugDto;
 import com.harmonycloud.enums.ErrorMsgEnum;
 import com.harmonycloud.exception.OrderException;
 import com.harmonycloud.result.CimsResponseWrapper;
-import com.harmonycloud.service.PrescriptionDrugService;
 import com.harmonycloud.service.PrescriptionService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -24,6 +23,7 @@ public class OrderController {
 
     @Autowired
     private PrescriptionService prescriptionService;
+
 
     /**
      * list drug history
@@ -45,18 +45,18 @@ public class OrderController {
     /**
      * get patient prescription in this enocunter
      *
-     * @param enocunterId
+     * @param encounterId
      * @return
      * @throws Exception
      */
     @GetMapping("/getPrescription")
     @ApiOperation(value = "get prescription  by enocunterId", httpMethod = "GET")
     @ApiImplicitParam(name = "encounterId", value = "encounterId", paramType = "query", dataType = "Integer")
-    public CimsResponseWrapper<DrugHistory> getPrescription(@RequestParam("enocunterId") Integer enocunterId) throws Exception {
-        if (enocunterId == null || enocunterId <= 0) {
+    public CimsResponseWrapper<DrugHistory> getPrescription(@RequestParam("encounterId") Integer encounterId) throws Exception {
+        if (encounterId == null || encounterId <= 0) {
             throw new OrderException(ErrorMsgEnum.PARAMETER_ERROR.getMessage());
         }
-        return prescriptionService.getPrescription(enocunterId);
+        return prescriptionService.getPrescription(encounterId);
     }
 
     /**
@@ -149,6 +149,5 @@ public class OrderController {
     public void updatePrescriptionDrugCancel(PrescriptionDrugDto dto) throws Exception {
         prescriptionService.updatePrescriptionCancel(dto);
     }
-
 
 }
