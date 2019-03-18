@@ -26,7 +26,7 @@ public class OrderController {
 
 
     /**
-     * list drug history
+     * list drug history by patientId
      *
      * @param patientId patientId
      * @return
@@ -43,7 +43,7 @@ public class OrderController {
     }
 
     /**
-     * get patient prescription in this enocunter
+     * get patient prescription by encounterId
      *
      * @param encounterId
      * @return

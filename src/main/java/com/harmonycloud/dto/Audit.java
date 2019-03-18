@@ -16,7 +16,8 @@ public class Audit {
     public Audit() {
     }
 
-    public Audit(Date date, String severityCD, String workstation, String clientIp, Integer userId, String projectCode, String correlationId, String applicationName, String infomation) {
+    public Audit(Date date, String severityCD, String workstation, String clientIp, Integer userId,
+                 String projectCode, String correlationId, String applicationName, String infomation) {
         this.date = date;
         this.severityCD = severityCD;
         this.workstation = workstation;

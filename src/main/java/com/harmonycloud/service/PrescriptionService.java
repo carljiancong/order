@@ -66,8 +66,8 @@ public class PrescriptionService {
     @Transactional(rollbackFor = Exception.class)
     public void savePrescriptionCancel(PrescriptionDto prescriptionDto) throws Exception {
         //delete prescription
-        Integer EncounterId = prescriptionDto.getPrescription().getEncounterId();
-        Prescription prescription = prescriptionRepository.findByEncounterId(EncounterId);
+        Integer encounterId = prescriptionDto.getPrescription().getEncounterId();
+        Prescription prescription = prescriptionRepository.findByEncounterId(encounterId);
         prescriptionRepository.delete(prescription);
 
         //delete prescriptionDrug
@@ -97,7 +97,7 @@ public class PrescriptionService {
         prescriptionRepository.save(prescription);
         // update prescription_drug
         if (prescriptionDrugDto.getNewPrescriptionDrugList().size() != 0) {
-            prescriptionDrugService.updatePrescriptionDrug(prescriptionDrugDto,prescription.getPrescriptionId());
+            prescriptionDrugService.updatePrescriptionDrug(prescriptionDrugDto, prescription.getPrescriptionId());
         }
 
         return new CimsResponseWrapper<String>(true, null, "Update  success");
@@ -116,7 +116,7 @@ public class PrescriptionService {
 
         prescriptionRepository.save(prescription);
         if (prescriptionDrugDto.getNewPrescriptionDrugList().size() != 0) {
-            prescriptionDrugService.updatePrescriptionDrugCancel(prescriptionDrugDto,prescription.getPrescriptionId());
+            prescriptionDrugService.updatePrescriptionDrugCancel(prescriptionDrugDto, prescription.getPrescriptionId());
         }
 
     }
@@ -130,7 +130,7 @@ public class PrescriptionService {
      */
     public CimsResponseWrapper<List> listDrugHistory(Integer patientId) throws Exception {
         List<Prescription> prescriptionList = prescriptionRepository.findByPatientId(patientId);
-        if (prescriptionList.size() != 0){
+        if (prescriptionList.size() != 0) {
             List<DrugHistory> drugHistoryList = new ArrayList<>();
             for (int i = 0; i < prescriptionList.size(); i++) {
                 List<PrescriptionDrugBo> prescriptionDrugBoList = prescriptionDrugService.listPrescriptionDrug(prescriptionList.get(i).getPrescriptionId());
@@ -139,8 +139,7 @@ public class PrescriptionService {
             }
 
             return new CimsResponseWrapper<List>(true, null, drugHistoryList);
-        }
-        else {
+        } else {
             return new CimsResponseWrapper<List>(true, null, null);
         }
 
@@ -160,8 +159,7 @@ public class PrescriptionService {
             List<PrescriptionDrugBo> prescriptionDrugBoList = prescriptionDrugService.listPrescriptionDrug(prescription.getPrescriptionId());
             DrugHistory drugHistory = new DrugHistory(prescription, prescriptionDrugBoList);
             return new CimsResponseWrapper<DrugHistory>(true, null, drugHistory);
-        }
-        else {
+        } else {
             return new CimsResponseWrapper<DrugHistory>(true, null, null);
 
         }

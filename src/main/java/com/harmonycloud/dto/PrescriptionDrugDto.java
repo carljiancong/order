@@ -13,7 +13,8 @@ public class PrescriptionDrugDto {
     public PrescriptionDrugDto() {
     }
 
-    public PrescriptionDrugDto(Prescription oldPrescription, List<PrescriptionDrug> oldPrescriptionDrugList, List<PrescriptionDrug> newPrescriptionDrugList) {
+    public PrescriptionDrugDto(Prescription oldPrescription, List<PrescriptionDrug> oldPrescriptionDrugList,
+                               List<PrescriptionDrug> newPrescriptionDrugList) {
         this.oldPrescription = oldPrescription;
         this.oldPrescriptionDrugList = oldPrescriptionDrugList;
         this.newPrescriptionDrugList = newPrescriptionDrugList;

@@ -1,7 +1,5 @@
 package com.harmonycloud.bo;
 
-import javax.persistence.*;
-
 public class PrescriptionDrugBo {
     private Integer prescriptionDrugId;
     private Integer drugId;

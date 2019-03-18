@@ -127,7 +127,8 @@ public class PrescriptionDrugService {
 
         //send message
         if (oldJson.containsKey("314") || oldJson.containsKey("316") || newJson.containsKey("314") || newJson.containsKey("316")) {
-            rocketMqService.sendMsg("OrderTopic", "OrderPush", getInfo((newJson.getIntValue("314") - oldJson.getIntValue("314")), (newJson.getIntValue("316") - oldJson.getIntValue("316"))));
+            rocketMqService.sendMsg("OrderTopic", "OrderPush",
+                    getInfo((newJson.getIntValue("314") - oldJson.getIntValue("314")), (newJson.getIntValue("316") - oldJson.getIntValue("316"))));
         }
         return new CimsResponseWrapper<String>(true, null, "Update  success");
     }
@@ -140,11 +141,13 @@ public class PrescriptionDrugService {
      */
     public void updatePrescriptionDrugCancel(PrescriptionDrugDto prescriptionDrugDto, Integer prescriptionId) throws Exception {
         List<PrescriptionDrug> oldPrescriptionDrugList = prescriptionDrugDto.getOldPrescriptionDrugList();
-        List<PrescriptionDrug> PrescriptionDrugList = prescriptionDrugRepository.findByPrescriptionId(prescriptionId);
-        if (oldPrescriptionDrugList.size() != 0)
-            prescriptionDrugRepository.deleteAll(PrescriptionDrugList);
-        if (PrescriptionDrugList.size() != 0)
+        List<PrescriptionDrug> prescriptionDrugList = prescriptionDrugRepository.findByPrescriptionId(prescriptionId);
+        if (oldPrescriptionDrugList.size() != 0) {
+            prescriptionDrugRepository.deleteAll(prescriptionDrugList);
+        }
+        if (prescriptionDrugList.size() != 0) {
             prescriptionDrugRepository.saveAll(oldPrescriptionDrugList);
+        }
 
         JSONObject oldJson = new JSONObject();
         JSONObject newJson = new JSONObject();
@@ -155,7 +158,7 @@ public class PrescriptionDrugService {
                 oldJson.put(drug.getDrugId().toString(), 1);
             }
         });
-        PrescriptionDrugList.forEach(drug -> {
+        prescriptionDrugList.forEach(drug -> {
             if (newJson.containsKey(drug.getDrugId().toString())) {
                 newJson.put(drug.getDrugId().toString(), newJson.getIntValue(drug.getDrugId().toString()) + 1);
             } else {
@@ -164,7 +167,8 @@ public class PrescriptionDrugService {
         });
 
         if (oldJson.containsKey("314") || oldJson.containsKey("316") || newJson.containsKey("314") || newJson.containsKey("316")) {
-            rocketMqService.sendMsg("OrderTopic", "OrderPush", "saga:" + getInfo((oldJson.getIntValue("314") - newJson.getIntValue("314")), (oldJson.getIntValue("316") - newJson.getIntValue("316"))));
+            rocketMqService.sendMsg("OrderTopic", "OrderPush",
+                    "saga:" + getInfo((oldJson.getIntValue("314") - newJson.getIntValue("314")), (oldJson.getIntValue("316") - newJson.getIntValue("316"))));
         }
     }
 
