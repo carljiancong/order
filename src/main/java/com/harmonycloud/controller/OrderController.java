@@ -25,9 +25,6 @@ public class OrderController {
     @Autowired
     private PrescriptionService prescriptionService;
 
-    @Autowired
-    private PrescriptionDrugService prescriptionDrugService;
-
     /**
      * list drug history
      *
@@ -136,7 +133,7 @@ public class OrderController {
     @PostMapping("/updatePrescription")
     @Compensable(compensationMethod = "updatePrescriptionDrugCancel", timeout = 5)
     public CimsResponseWrapper<String> updatePrescription(@RequestBody PrescriptionDrugDto dto) throws Exception {
-        if (dto == null ) {
+        if (dto == null) {
             throw new OrderException(ErrorMsgEnum.PARAMETER_ERROR.getMessage());
         }
         prescriptionService.updatePrescription(dto);
@@ -152,5 +149,6 @@ public class OrderController {
     public void updatePrescriptionDrugCancel(PrescriptionDrugDto dto) throws Exception {
         prescriptionService.updatePrescriptionCancel(dto);
     }
+
 
 }

@@ -5,7 +5,6 @@ import com.harmonycloud.bo.PrescriptionDrugBo;
 import com.harmonycloud.bo.UserPrincipal;
 import com.harmonycloud.config.OrderConfigurationProperties;
 import com.harmonycloud.dto.PrescriptionDrugDto;
-import com.harmonycloud.entity.Drug;
 import com.harmonycloud.entity.PrescriptionDrug;
 import com.harmonycloud.enums.ErrorMsgEnum;
 import com.harmonycloud.exception.OrderException;
@@ -15,7 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class PrescriptionDrugService {
@@ -176,25 +177,30 @@ public class PrescriptionDrugService {
                 .getPrincipal();
         String token = userDetails.getToken();
         List<PrescriptionDrug> prescriptionDrugList = prescriptionDrugRepository.findByPrescriptionId(prescriptionId);
-        List<PrescriptionDrugBo> prescriptionDrugBoList = null;
-        Integer[] drugIdList = new Integer[prescriptionDrugList.size()];
-
-        for (int i = 0; i < prescriptionDrugList.size(); i++) {
-            drugIdList[i] = prescriptionDrugList.get(i).getDrugId();
-        }
-        List<Drug> drugList = syncService.save(config.getDrugUri(), token, drugIdList).getDurgList();
+        if (prescriptionDrugList.size() != 0) {
+            List<PrescriptionDrugBo> prescriptionDrugBoList = new ArrayList<>();
+            Integer[] drugIdList = new Integer[prescriptionDrugList.size()];
 
 
-        prescriptionDrugList.forEach(prescriptionDrug -> {
-            drugList.forEach(drug -> {
-                if (prescriptionDrug.getDrugId() == drug.getDrugId()) {
-                    PrescriptionDrugBo prescriptionDrugBo = new PrescriptionDrugBo(prescriptionDrug.getPrescriptionDrugId(), prescriptionDrug.getDrugId(),
-                            drug.getTradeName(), drug.getIngredient(), prescriptionDrug.getReginmenLine(), prescriptionId);
-                    prescriptionDrugBoList.add(prescriptionDrugBo);
-                }
+            for (int i = 0; i < prescriptionDrugList.size(); i++) {
+                drugIdList[i] = prescriptionDrugList.get(i).getDrugId();
+            }
+            Object test = syncService.save(config.getDrugUri(), token, drugIdList).getReturnObject();
+            List<Map> tmp = (List<Map>) test;
+
+            prescriptionDrugList.forEach(prescriptionDrug -> {
+                tmp.forEach(drug -> {
+                    if (prescriptionDrug.getDrugId() == drug.get("drugId")) {
+                        PrescriptionDrugBo prescriptionDrugBo = new PrescriptionDrugBo(prescriptionDrug.getPrescriptionDrugId(), prescriptionDrug.getDrugId(),
+                                drug.get("tradeName").toString(), drug.get("ingredient").toString(), prescriptionDrug.getReginmenLine(), prescriptionId);
+                        prescriptionDrugBoList.add(prescriptionDrugBo);
+                    }
+                });
             });
-        });
-        return prescriptionDrugBoList;
+            return prescriptionDrugBoList;
+        } else {
+            return null;
+        }
 
     }
 

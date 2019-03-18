@@ -1,7 +1,5 @@
 package com.harmonycloud.dto;
 
-import com.harmonycloud.entity.PrescriptionDrug;
-
 import java.util.Date;
 
 public class Aduit {
@@ -21,7 +19,7 @@ public class Aduit {
     public Aduit(Date date, String severityCD, String workstation, String clientIp, Integer userId, String projectCode, String correlationId, String applicationName, String infomation) {
         this.date = date;
         this.severityCD = severityCD;
-        workstation = workstation;
+        this.workstation = workstation;
         this.clientIp = clientIp;
         this.userId = userId;
         this.projectCode = projectCode;
@@ -59,7 +57,7 @@ public class Aduit {
     }
 
     public void setWorkstation(String workstation) {
-        workstation = workstation;
+        this.workstation = workstation;
     }
 
     public Integer getUserId() {

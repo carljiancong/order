@@ -37,6 +37,7 @@ public class PrescriptionService {
      */
     @Transactional(rollbackFor = Exception.class)
     public CimsResponseWrapper<String> savePrescription(PrescriptionDto prescriptionDto) throws Exception {
+        Prescription oldPrescription = prescriptionRepository.findByEncounterId(prescriptionDto.getPrescription().getEncounterId());
         Prescription prescription = prescriptionDto.getPrescription();
         List<PrescriptionDrug> prescriptionDrugList = prescriptionDto.getPrescriptionDrugList();
         UserPrincipal userDetails = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
