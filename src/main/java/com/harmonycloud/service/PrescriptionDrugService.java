@@ -193,7 +193,7 @@ public class PrescriptionDrugService {
             prescriptionDrugList.forEach(prescriptionDrug -> {
                 Map<String, Object> drug = tmp.get(prescriptionDrug.getDrugId().toString());
                 PrescriptionDrugBo prescriptionDrugBo = new PrescriptionDrugBo(prescriptionDrug.getPrescriptionDrugId(), prescriptionDrug.getDrugId(),
-                        drug.get("tradeName").toString(), drug.get("ingredient").toString(), prescriptionDrug.getReginmenLine(), prescriptionId);
+                        drug.get("tradeName").toString(), drug.get("ingredient").toString(), prescriptionDrug.getRegimenLine(), prescriptionId);
                 prescriptionDrugBoList.add(prescriptionDrugBo);
             });
             return prescriptionDrugBoList;
