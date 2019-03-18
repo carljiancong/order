@@ -16,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -129,14 +130,20 @@ public class PrescriptionService {
      */
     public CimsResponseWrapper<List> listDrugHistory(Integer patientId) throws Exception {
         List<Prescription> prescriptionList = prescriptionRepository.findByPatientId(patientId);
-        List<DrugHistory> drugHistoryList = null;
-        for (int i = 0; i < prescriptionList.size(); i++) {
-            List<PrescriptionDrugBo> prescriptionDrugBoList = prescriptionDrugService.listPrescriptionDrug(prescriptionList.get(i).getPrescriptionId());
-            DrugHistory drugHistory = new DrugHistory(prescriptionList.get(i), prescriptionDrugBoList);
-            drugHistoryList.add(drugHistory);
+        if (prescriptionList.size() != 0){
+            List<DrugHistory> drugHistoryList = new ArrayList<>();
+            for (int i = 0; i < prescriptionList.size(); i++) {
+                List<PrescriptionDrugBo> prescriptionDrugBoList = prescriptionDrugService.listPrescriptionDrug(prescriptionList.get(i).getPrescriptionId());
+                DrugHistory drugHistory = new DrugHistory(prescriptionList.get(i), prescriptionDrugBoList);
+                drugHistoryList.add(drugHistory);
+            }
+
+            return new CimsResponseWrapper<List>(true, null, drugHistoryList);
+        }
+        else {
+            return new CimsResponseWrapper<List>(true, null, null);
         }
 
-        return new CimsResponseWrapper<List>(true, null, drugHistoryList);
     }
 
 
@@ -149,10 +156,15 @@ public class PrescriptionService {
      */
     public CimsResponseWrapper<DrugHistory> getPrescription(Integer encounterId) throws Exception {
         Prescription prescription = prescriptionRepository.findByEncounterId(encounterId);
-        List<PrescriptionDrugBo> prescriptionDrugBoList = prescriptionDrugService.listPrescriptionDrug(prescription.getPrescriptionId());
-        DrugHistory drugHistory = new DrugHistory(prescription, prescriptionDrugBoList);
-        return new CimsResponseWrapper<DrugHistory>(true, null, drugHistory);
-    }
+        if (prescription != null) {
+            List<PrescriptionDrugBo> prescriptionDrugBoList = prescriptionDrugService.listPrescriptionDrug(prescription.getPrescriptionId());
+            DrugHistory drugHistory = new DrugHistory(prescription, prescriptionDrugBoList);
+            return new CimsResponseWrapper<DrugHistory>(true, null, drugHistory);
+        }
+        else {
+            return new CimsResponseWrapper<DrugHistory>(true, null, null);
 
+        }
+    }
 
 }

@@ -1,5 +1,6 @@
 package com.harmonycloud.service;
 
+import com.alibaba.fastjson.JSON;
 import com.harmonycloud.bo.UserPrincipal;
 import com.harmonycloud.dto.Audit;
 import com.harmonycloud.enums.ErrorMsgEnum;
@@ -58,7 +59,7 @@ public class RocketMqService {
                 userDetails.getId(), "CIMS", uuid, "MedicationOrder", information);
 
 
-        Message message = new Message(topic, tags, audit.toString().getBytes());
+        Message message = new Message(topic, tags, JSON.toJSONString(audit).getBytes());
         StopWatch stop = new StopWatch();
         stop.start();
         SendResult result = producer.send(message);

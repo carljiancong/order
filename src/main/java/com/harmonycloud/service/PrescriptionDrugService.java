@@ -5,7 +5,6 @@ import com.harmonycloud.bo.PrescriptionDrugBo;
 import com.harmonycloud.bo.UserPrincipal;
 import com.harmonycloud.config.OrderConfigurationProperties;
 import com.harmonycloud.dto.PrescriptionDrugDto;
-import com.harmonycloud.entity.Drug;
 import com.harmonycloud.entity.PrescriptionDrug;
 import com.harmonycloud.enums.ErrorMsgEnum;
 import com.harmonycloud.exception.OrderException;
@@ -187,7 +186,7 @@ public class PrescriptionDrugService {
                 drugIdList[i] = prescriptionDrugList.get(i).getDrugId();
             }
             //get drug list
-            Object test = syncService.save(config.getDrugUri(), token, drugIdList).getReturnObject();
+            Object test = syncService.save(config.getDrugUri(), token, drugIdList).getData();
 
             Map<Integer, Map> tmp = (Map<Integer, Map>) test;
 

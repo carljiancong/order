@@ -8,7 +8,6 @@ public enum ErrorMsgEnum {
     SAVE_ERROR("Save error"),
     UPDATE_ERROR("Update error"),
     ROCKETMQ_ERROR("Rocketmq send message error");
-
     private String message;
 
     ErrorMsgEnum(String message) {
