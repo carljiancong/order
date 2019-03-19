@@ -97,7 +97,7 @@ public class PrescriptionDrugService {
     public CimsResponseWrapper<String> updatePrescriptionDrug(PrescriptionDrugDto prescriptionDrugDto, Integer prescriptionId) throws Exception {
         List<PrescriptionDrug> oldPrescriptionDrugList = prescriptionDrugDto.getOldPrescriptionDrugList();
         List<PrescriptionDrug> newPrescriptionDrugList = prescriptionDrugDto.getNewPrescriptionDrugList();
-        if (oldPrescriptionDrugList.size() != 0) {
+        if (oldPrescriptionDrugList != null) {
             prescriptionDrugRepository.deleteAll(oldPrescriptionDrugList);
         }
 
@@ -142,10 +142,10 @@ public class PrescriptionDrugService {
     public void updatePrescriptionDrugCancel(PrescriptionDrugDto prescriptionDrugDto, Integer prescriptionId) throws Exception {
         List<PrescriptionDrug> oldPrescriptionDrugList = prescriptionDrugDto.getOldPrescriptionDrugList();
         List<PrescriptionDrug> prescriptionDrugList = prescriptionDrugRepository.findByPrescriptionId(prescriptionId);
-        if (oldPrescriptionDrugList.size() != 0) {
+        if (oldPrescriptionDrugList != null) {
             prescriptionDrugRepository.deleteAll(prescriptionDrugList);
         }
-        if (prescriptionDrugList.size() != 0) {
+        if (prescriptionDrugList.size() != 0 ) {
             prescriptionDrugRepository.saveAll(oldPrescriptionDrugList);
         }
 

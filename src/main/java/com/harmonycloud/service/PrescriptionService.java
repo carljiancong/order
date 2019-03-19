@@ -50,11 +50,11 @@ public class PrescriptionService {
         if (prescriptionRepository.save(prescription).getPrescriptionId() == null) {
             throw new OrderException(ErrorMsgEnum.SAVE_ERROR.getMessage());
         }
-        if (prescriptionDrugList.size() != 0) {
+        if (prescriptionDrugList != null) {
             // save prescriptionDrug
             prescriptionDrugService.savePrescriptionDrug(prescriptionDrugList, prescription.getPrescriptionId());
         }
-
+//        throw new Exception("test");
         return new CimsResponseWrapper<>(true, null, "Save success");
     }
 
@@ -72,7 +72,7 @@ public class PrescriptionService {
 
         //delete prescriptionDrug
         List<PrescriptionDrug> prescriptionDrugList = prescriptionDto.getPrescriptionDrugList();
-        if (prescriptionDrugList.size() != 0) {
+        if (prescriptionDrugList == null) {
             prescriptionDrugService.savePrescriptionDrugCancel(prescription.getPrescriptionId());
         }
     }
@@ -96,7 +96,7 @@ public class PrescriptionService {
         // update prescription
         prescriptionRepository.save(prescription);
         // update prescription_drug
-        if (prescriptionDrugDto.getNewPrescriptionDrugList().size() != 0) {
+        if (prescriptionDrugDto.getNewPrescriptionDrugList() != null) {
             prescriptionDrugService.updatePrescriptionDrug(prescriptionDrugDto, prescription.getPrescriptionId());
         }
 
@@ -115,7 +115,7 @@ public class PrescriptionService {
         prescription.setPrescriptionId(prescriptionRepository.findByEncounterId(prescriptionDrugDto.getOldPrescription().getEncounterId()).getPrescriptionId());
 
         prescriptionRepository.save(prescription);
-        if (prescriptionDrugDto.getNewPrescriptionDrugList().size() != 0) {
+        if (prescriptionDrugDto.getNewPrescriptionDrugList() != null) {
             prescriptionDrugService.updatePrescriptionDrugCancel(prescriptionDrugDto, prescription.getPrescriptionId());
         }
 
