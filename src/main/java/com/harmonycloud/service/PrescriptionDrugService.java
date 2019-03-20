@@ -97,33 +97,37 @@ public class PrescriptionDrugService {
     public CimsResponseWrapper<String> updatePrescriptionDrug(PrescriptionDrugDto prescriptionDrugDto, Integer prescriptionId) throws Exception {
         List<PrescriptionDrug> oldPrescriptionDrugList = prescriptionDrugDto.getOldPrescriptionDrugList();
         List<PrescriptionDrug> newPrescriptionDrugList = prescriptionDrugDto.getNewPrescriptionDrugList();
-        if (oldPrescriptionDrugList != null) {
-            prescriptionDrugRepository.deleteAll(oldPrescriptionDrugList);
-        }
-
-        for (int i = 0; i < newPrescriptionDrugList.size(); i++) {
-            newPrescriptionDrugList.get(i).setPrescriptionId(prescriptionId);
-            if (prescriptionDrugRepository.save(newPrescriptionDrugList.get(i)).getPrescriptionDrugId() == null) {
-                throw new OrderException(ErrorMsgEnum.UPDATE_ERROR.getMessage());
-            }
-        }
-
         JSONObject oldJson = new JSONObject();
         JSONObject newJson = new JSONObject();
-        oldPrescriptionDrugList.forEach(drug -> {
-            if (oldJson.containsKey(drug.getDrugId().toString())) {
-                oldJson.put(drug.getDrugId().toString(), oldJson.getIntValue(drug.getDrugId().toString()) + 1);
-            } else {
-                oldJson.put(drug.getDrugId().toString(), 1);
+
+
+        if (oldPrescriptionDrugList != null) {
+            prescriptionDrugRepository.deleteAll(oldPrescriptionDrugList);
+            oldPrescriptionDrugList.forEach(drug -> {
+                if (oldJson.containsKey(drug.getDrugId().toString())) {
+                    oldJson.put(drug.getDrugId().toString(), oldJson.getIntValue(drug.getDrugId().toString()) + 1);
+                } else {
+                    oldJson.put(drug.getDrugId().toString(), 1);
+                }
+            });
+        }
+
+        if (newPrescriptionDrugList != null) {
+            for (int i = 0; i < newPrescriptionDrugList.size(); i++) {
+                newPrescriptionDrugList.get(i).setPrescriptionId(prescriptionId);
+                if (prescriptionDrugRepository.save(newPrescriptionDrugList.get(i)).getPrescriptionDrugId() == null) {
+                    throw new OrderException(ErrorMsgEnum.UPDATE_ERROR.getMessage());
+                }
             }
-        });
-        newPrescriptionDrugList.forEach(drug -> {
-            if (newJson.containsKey(drug.getDrugId().toString())) {
-                newJson.put(drug.getDrugId().toString(), newJson.getIntValue(drug.getDrugId().toString()) + 1);
-            } else {
-                newJson.put(drug.getDrugId().toString(), 1);
-            }
-        });
+            newPrescriptionDrugList.forEach(drug -> {
+                if (newJson.containsKey(drug.getDrugId().toString())) {
+                    newJson.put(drug.getDrugId().toString(), newJson.getIntValue(drug.getDrugId().toString()) + 1);
+                } else {
+                    newJson.put(drug.getDrugId().toString(), 1);
+                }
+            });
+        }
+
 
         //send message
         if (oldJson.containsKey("314") || oldJson.containsKey("316") || newJson.containsKey("314") || newJson.containsKey("316")) {
@@ -142,29 +146,28 @@ public class PrescriptionDrugService {
     public void updatePrescriptionDrugCancel(PrescriptionDrugDto prescriptionDrugDto, Integer prescriptionId) throws Exception {
         List<PrescriptionDrug> oldPrescriptionDrugList = prescriptionDrugDto.getOldPrescriptionDrugList();
         List<PrescriptionDrug> prescriptionDrugList = prescriptionDrugRepository.findByPrescriptionId(prescriptionId);
-        if (oldPrescriptionDrugList != null) {
-            prescriptionDrugRepository.deleteAll(prescriptionDrugList);
-        }
-        if (prescriptionDrugList.size() != 0 ) {
-            prescriptionDrugRepository.saveAll(oldPrescriptionDrugList);
-        }
-
         JSONObject oldJson = new JSONObject();
         JSONObject newJson = new JSONObject();
-        oldPrescriptionDrugList.forEach(drug -> {
-            if (oldJson.containsKey(drug.getDrugId().toString())) {
-                oldJson.put(drug.getDrugId().toString(), oldJson.getIntValue(drug.getDrugId().toString()) + 1);
-            } else {
-                oldJson.put(drug.getDrugId().toString(), 1);
-            }
-        });
-        prescriptionDrugList.forEach(drug -> {
-            if (newJson.containsKey(drug.getDrugId().toString())) {
-                newJson.put(drug.getDrugId().toString(), newJson.getIntValue(drug.getDrugId().toString()) + 1);
-            } else {
-                newJson.put(drug.getDrugId().toString(), 1);
-            }
-        });
+        if (oldPrescriptionDrugList != null) {
+            prescriptionDrugRepository.deleteAll(prescriptionDrugList);
+            oldPrescriptionDrugList.forEach(drug -> {
+                if (oldJson.containsKey(drug.getDrugId().toString())) {
+                    oldJson.put(drug.getDrugId().toString(), oldJson.getIntValue(drug.getDrugId().toString()) + 1);
+                } else {
+                    oldJson.put(drug.getDrugId().toString(), 1);
+                }
+            });
+        }
+        if (prescriptionDrugList.size() != 0) {
+            prescriptionDrugRepository.saveAll(oldPrescriptionDrugList);
+            prescriptionDrugList.forEach(drug -> {
+                if (newJson.containsKey(drug.getDrugId().toString())) {
+                    newJson.put(drug.getDrugId().toString(), newJson.getIntValue(drug.getDrugId().toString()) + 1);
+                } else {
+                    newJson.put(drug.getDrugId().toString(), 1);
+                }
+            });
+        }
 
         if (oldJson.containsKey("314") || oldJson.containsKey("316") || newJson.containsKey("314") || newJson.containsKey("316")) {
             rocketMqService.sendMsg("OrderTopic", "OrderPush",
