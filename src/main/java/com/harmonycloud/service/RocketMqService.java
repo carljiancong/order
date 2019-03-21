@@ -7,6 +7,8 @@ import com.harmonycloud.enums.ErrorMsgEnum;
 import com.harmonycloud.exception.OrderException;
 import com.harmonycloud.util.IpUtil;
 import com.harmonycloud.util.LogUtil;
+import eu.bitwalker.useragentutils.OperatingSystem;
+import eu.bitwalker.useragentutils.UserAgent;
 import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
 import org.apache.rocketmq.client.producer.SendResult;
@@ -14,7 +16,6 @@ import org.apache.rocketmq.client.producer.SendStatus;
 import org.apache.rocketmq.common.message.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -54,15 +55,18 @@ public class RocketMqService {
         }
     }
 
-    public String sendMsg(String topic, String tags, String information,HttpServletRequest request) throws Exception {
+    public String sendMsg(String topic, String tags, String information, HttpServletRequest request) throws Exception {
         String msg = LogUtil.getRequest(request) + ", information='";
 
         UserPrincipal userDetails = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
-
         String correlation = request.getHeader("x-b3-traceid");
-        Audit audit = new Audit(new Date(), "Critical", "Computer", IpUtil.getIpAddress(request),
+
+        String agent = request.getHeader("User-Agent");
+        OperatingSystem operatingSystem = UserAgent.parseUserAgentString(agent).getOperatingSystem();
+        Audit audit = new Audit(new Date(), "Critical", operatingSystem.getDeviceType() + ":" + operatingSystem.getName(), IpUtil.getIpAddress(request),
                 userDetails.getId(), "CIMS", correlation, "MedicationOrder", information);
+
 
         Message message = new Message(topic, tags, JSON.toJSONString(audit).getBytes());
         StopWatch stop = new StopWatch();
