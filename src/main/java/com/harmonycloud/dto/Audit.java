@@ -3,14 +3,23 @@ package com.harmonycloud.dto;
 import java.util.Date;
 
 public class Audit {
+
     private Date date;
+
     private String severityCD;
+
     private String workstation;
+
     private String clientIp;
+
     private Integer userId;
+
     private String projectCode;
+
     private String correlationId;
+
     private String applicationName;
+
     private String infomation;
 
     public Audit() {

@@ -10,16 +10,22 @@ public class Prescription {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Integer prescriptionId;
+
     @Column(name = "patient_id")
     private Integer patientId;
+
     @Column(name = "encounter_id")
     private Integer encounterId;
+
     @Column(name = "create_by")
     private String createBy;
+
     @Column(name = "create_date")
     private Date createDate;
+
     @Column(name = "clinic_id")
     private Integer clinicId;
+
     @Column(name = "clinic_name")
     private String clinicName;
 

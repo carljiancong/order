@@ -9,10 +9,11 @@ import com.harmonycloud.entity.PrescriptionDrug;
 import com.harmonycloud.enums.ErrorMsgEnum;
 import com.harmonycloud.exception.OrderException;
 import com.harmonycloud.repository.PrescriptionDrugRepository;
-import com.harmonycloud.result.CimsResponseWrapper;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ import java.util.Map;
 
 @Service
 public class PrescriptionDrugService {
+
     @Autowired
     private PrescriptionDrugRepository prescriptionDrugRepository;
     @Autowired
@@ -37,13 +39,13 @@ public class PrescriptionDrugService {
     /**
      * save prescription_drug
      *
-     * @param prescriptionDrugList model
+     * @param prescriptionDrugList List<PrescriptionDrug>
      * @param prescriptionId       prescriptionId
      * @return
      * @throws Exception
      */
 
-    public CimsResponseWrapper<String> savePrescriptionDrug(List<PrescriptionDrug> prescriptionDrugList, Integer prescriptionId) throws Exception {
+    public void savePrescriptionDrug(List<PrescriptionDrug> prescriptionDrugList, Integer prescriptionId) throws Exception {
 
         for (int i = 0; i < prescriptionDrugList.size(); i++) {
             prescriptionDrugList.get(i).setPrescriptionId(prescriptionId);
@@ -62,10 +64,8 @@ public class PrescriptionDrugService {
         });
         //send message
         if (json.containsKey("314") || json.containsKey("316")) {
-            rocketMqService.sendMsg("OrderTopic", "OrderPush", getInfo(json.getIntValue("314"), json.getIntValue("316")),request);
+            rocketMqService.sendMsg("OrderTopic", "OrderPush", getInfo(json.getIntValue("314"), json.getIntValue("316")), request);
         }
-
-        return new CimsResponseWrapper<String>(true, null, "Save success");
     }
 
     /**
@@ -74,6 +74,7 @@ public class PrescriptionDrugService {
      * @param prescriptionId prescriptionId
      */
     public void savePrescriptionDrugCancel(Integer prescriptionId) throws Exception {
+
         List<PrescriptionDrug> prescriptionDrugList = prescriptionDrugRepository.findByPrescriptionId(prescriptionId);
         for (int i = 0; i < prescriptionDrugList.size(); i++) {
             prescriptionDrugRepository.delete(prescriptionDrugList.get(i));
@@ -88,22 +89,23 @@ public class PrescriptionDrugService {
         });
         //send message
         if (json.containsKey("314") || json.containsKey("316")) {
-            rocketMqService.sendMsg("OrderTopic", "OrderPush", "saga:" + getInfo(-json.getIntValue("314"), -json.getIntValue("316")),request);
+            rocketMqService.sendMsg("OrderTopic", "OrderPush", "saga:" + getInfo(-json.getIntValue("314"), -json.getIntValue("316")), request);
         }
     }
 
     /**
-     * update prescription_drug
+     * update prescription drug
      *
-     * @param prescriptionDrugDto model
+     * @param oldPrescriptionDrugList List<PrescriptionDrug>
+     * @param newPrescriptionDrugList List<PrescriptionDrug>
+     * @param prescriptionId          prescriptionId
      * @return
+     * @throws Exception
      */
-    public CimsResponseWrapper<String> updatePrescriptionDrug(PrescriptionDrugDto prescriptionDrugDto, Integer prescriptionId) throws Exception {
-        List<PrescriptionDrug> oldPrescriptionDrugList = prescriptionDrugDto.getOldPrescriptionDrugList();
-        List<PrescriptionDrug> newPrescriptionDrugList = prescriptionDrugDto.getNewPrescriptionDrugList();
+    public void updatePrescriptionDrug(List<PrescriptionDrug> oldPrescriptionDrugList, List<PrescriptionDrug> newPrescriptionDrugList, Integer prescriptionId) throws Exception {
+
         JSONObject oldJson = new JSONObject();
         JSONObject newJson = new JSONObject();
-
 
         if (oldPrescriptionDrugList != null) {
             prescriptionDrugRepository.deleteAll(oldPrescriptionDrugList);
@@ -136,24 +138,35 @@ public class PrescriptionDrugService {
         //send message
         if (oldJson.containsKey("314") || oldJson.containsKey("316") || newJson.containsKey("314") || newJson.containsKey("316")) {
             rocketMqService.sendMsg("OrderTopic", "OrderPush",
-                    getInfo((newJson.getIntValue("314") - oldJson.getIntValue("314")), (newJson.getIntValue("316") - oldJson.getIntValue("316"))),request);
+                    getInfo((newJson.getIntValue("314") - oldJson.getIntValue("314")), (newJson.getIntValue("316") - oldJson.getIntValue("316"))), request);
         }
-        return new CimsResponseWrapper<String>(true, null, "Update  success");
     }
 
 
     /**
      * saga:update Prescription_drug rollback
      *
-     * @param prescriptionDrugDto model
+     * @param oldPrescriptionDrugList List<prescriptionDrug>
+     * @param prescriptionId          prescrptionId
+     * @throws Exception
      */
-    public void updatePrescriptionDrugCancel(PrescriptionDrugDto prescriptionDrugDto, Integer prescriptionId) throws Exception {
-        List<PrescriptionDrug> oldPrescriptionDrugList = prescriptionDrugDto.getOldPrescriptionDrugList();
-        List<PrescriptionDrug> prescriptionDrugList = prescriptionDrugRepository.findByPrescriptionId(prescriptionId);
+    public void updatePrescriptionDrugCancel(List<PrescriptionDrug> oldPrescriptionDrugList, Integer prescriptionId) throws Exception {
+
+        List<PrescriptionDrug> newPrescriptionDrugList = prescriptionDrugRepository.findByPrescriptionId(prescriptionId);
         JSONObject oldJson = new JSONObject();
         JSONObject newJson = new JSONObject();
-        if (oldPrescriptionDrugList != null) {
-            prescriptionDrugRepository.deleteAll(prescriptionDrugList);
+        if (newPrescriptionDrugList != null) {
+            prescriptionDrugRepository.deleteAll(newPrescriptionDrugList);
+            newPrescriptionDrugList.forEach(drug -> {
+                if (newJson.containsKey(drug.getDrugId().toString())) {
+                    newJson.put(drug.getDrugId().toString(), newJson.getIntValue(drug.getDrugId().toString()) + 1);
+                } else {
+                    newJson.put(drug.getDrugId().toString(), 1);
+                }
+            });
+        }
+        if (oldPrescriptionDrugList.size() != 0) {
+            prescriptionDrugRepository.saveAll(oldPrescriptionDrugList);
             oldPrescriptionDrugList.forEach(drug -> {
                 if (oldJson.containsKey(drug.getDrugId().toString())) {
                     oldJson.put(drug.getDrugId().toString(), oldJson.getIntValue(drug.getDrugId().toString()) + 1);
@@ -162,20 +175,10 @@ public class PrescriptionDrugService {
                 }
             });
         }
-        if (prescriptionDrugList.size() != 0) {
-            prescriptionDrugRepository.saveAll(oldPrescriptionDrugList);
-            prescriptionDrugList.forEach(drug -> {
-                if (newJson.containsKey(drug.getDrugId().toString())) {
-                    newJson.put(drug.getDrugId().toString(), newJson.getIntValue(drug.getDrugId().toString()) + 1);
-                } else {
-                    newJson.put(drug.getDrugId().toString(), 1);
-                }
-            });
-        }
 
         if (oldJson.containsKey("314") || oldJson.containsKey("316") || newJson.containsKey("314") || newJson.containsKey("316")) {
             rocketMqService.sendMsg("OrderTopic", "OrderPush",
-                    "saga:" + getInfo((oldJson.getIntValue("314") - newJson.getIntValue("314")), (oldJson.getIntValue("316") - newJson.getIntValue("316"))),request);
+                    "saga:" + getInfo((oldJson.getIntValue("314") - newJson.getIntValue("314")), (oldJson.getIntValue("316") - newJson.getIntValue("316"))), request);
         }
     }
 
@@ -187,11 +190,12 @@ public class PrescriptionDrugService {
      * @throws Exception
      */
     public List<PrescriptionDrugBo> listPrescriptionDrug(Integer prescriptionId) throws Exception {
+
         UserPrincipal userDetails = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
         String token = userDetails.getToken();
         List<PrescriptionDrug> prescriptionDrugList = prescriptionDrugRepository.findByPrescriptionId(prescriptionId);
-        if (prescriptionDrugList.size() != 0) {
+        if (!CollectionUtils.isEmpty(prescriptionDrugList)) {
             List<PrescriptionDrugBo> prescriptionDrugBoList = new ArrayList<>();
             Integer[] drugIdList = new Integer[prescriptionDrugList.size()];
 
@@ -217,6 +221,13 @@ public class PrescriptionDrugService {
 
     }
 
+    /**
+     * msg format
+     *
+     * @param juniorNum medication junior number
+     * @param adultNum  medication adult number
+     * @return
+     */
     private String getInfo(int juniorNum, int adultNum) {
         StringBuilder info = new StringBuilder();
 

@@ -9,9 +9,12 @@ public class PrescriptionDrug {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Integer prescriptionDrugId;
     @Column(name = "drug_id")
+
     private Integer drugId;
+
     @Column(name = "regimen_line")
     private String regimenLine;
+
     @Column(name = "prescription_id")
     private Integer prescriptionId;
 

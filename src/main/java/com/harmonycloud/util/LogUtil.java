@@ -9,14 +9,11 @@ public class LogUtil {
 
 
     public static String getRequest(HttpServletRequest request) {
-        String uuid = null;
-        for (int i = 0; i < 10; i++) {
-            uuid = UUID.randomUUID().toString().replaceAll("-", "");
-        }
         if (request != null) {
             String ip = IpUtil.getIpAddress(request);
+            String correlation = request.getHeader("x-b3-traceid");
             String loginName = request.getHeader("user");
-            Log log = new Log(ip, loginName, "CIMS", uuid, "User Application");
+            Log log = new Log(ip, loginName, "CIMS", correlation, "User Application");
             return log.toString();
         }
         return null;

@@ -18,15 +18,12 @@ public class ExceptionHandler {
     @Autowired
     HttpServletRequest request;
 
-
-
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @org.springframework.web.bind.annotation.ExceptionHandler(value = Exception.class)
     @ResponseBody
     public CimsResponseWrapper<Object> handler(Throwable e) {
         String msg = LogUtil.getRequest(request);
-
         logger.error(msg + ", information='" + e.getMessage() + '\'');
         if (e instanceof OrderException) {
             return new CimsResponseWrapper<>(false, e.getMessage(), null);

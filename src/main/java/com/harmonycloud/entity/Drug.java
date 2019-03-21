@@ -1,8 +1,11 @@
 package com.harmonycloud.entity;
 
 public class Drug {
+
     private Integer drugId;
+
     private String ingredient;
+
     private String tradeName;
 
     public Drug() {

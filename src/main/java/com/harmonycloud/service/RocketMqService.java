@@ -74,7 +74,6 @@ public class RocketMqService {
         SendResult result = producer.send(message);
         if (result.getSendStatus().equals(SendStatus.SEND_OK)) {
             logger.info(msg + "send message success'");
-
             System.out.println("发送响应：MsgId:" + result.getMsgId() + "，发送状态:" + result.getSendStatus());
         } else {
             throw new OrderException(ErrorMsgEnum.ROCKETMQ_ERROR.getMessage());

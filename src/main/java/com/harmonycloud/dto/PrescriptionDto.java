@@ -6,7 +6,9 @@ import com.harmonycloud.entity.PrescriptionDrug;
 import java.util.List;
 
 public class PrescriptionDto {
+
     private Prescription prescription;
+
     private List<PrescriptionDrug> prescriptionDrugList;
 
     public PrescriptionDto() {

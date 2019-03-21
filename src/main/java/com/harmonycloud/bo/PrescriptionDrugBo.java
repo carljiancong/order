@@ -1,11 +1,17 @@
 package com.harmonycloud.bo;
 
 public class PrescriptionDrugBo {
+
     private Integer prescriptionDrugId;
+
     private Integer drugId;
+
     private String tradeName;
+
     private String ingredient;
+
     private String regimenLine;
+
     private Integer prescriptionId;
 
     public PrescriptionDrugBo() {

@@ -6,26 +6,28 @@ import com.harmonycloud.entity.PrescriptionDrug;
 import java.util.List;
 
 public class PrescriptionDrugDto {
-    private Prescription oldPrescription;
+
+    private Prescription Prescription;
+
     private List<PrescriptionDrug> oldPrescriptionDrugList;
+
     private List<PrescriptionDrug> newPrescriptionDrugList;
 
     public PrescriptionDrugDto() {
     }
 
-    public PrescriptionDrugDto(Prescription oldPrescription, List<PrescriptionDrug> oldPrescriptionDrugList,
-                               List<PrescriptionDrug> newPrescriptionDrugList) {
-        this.oldPrescription = oldPrescription;
+    public PrescriptionDrugDto(com.harmonycloud.entity.Prescription prescription, List<PrescriptionDrug> oldPrescriptionDrugList, List<PrescriptionDrug> newPrescriptionDrugList) {
+        Prescription = prescription;
         this.oldPrescriptionDrugList = oldPrescriptionDrugList;
         this.newPrescriptionDrugList = newPrescriptionDrugList;
     }
 
-    public Prescription getOldPrescription() {
-        return oldPrescription;
+    public com.harmonycloud.entity.Prescription getPrescription() {
+        return Prescription;
     }
 
-    public void setOldPrescription(Prescription oldPrescription) {
-        this.oldPrescription = oldPrescription;
+    public void setPrescription(com.harmonycloud.entity.Prescription prescription) {
+        Prescription = prescription;
     }
 
     public List<PrescriptionDrug> getOldPrescriptionDrugList() {
