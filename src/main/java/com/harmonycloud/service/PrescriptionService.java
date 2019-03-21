@@ -11,23 +11,34 @@ import com.harmonycloud.enums.ErrorMsgEnum;
 import com.harmonycloud.exception.OrderException;
 import com.harmonycloud.repository.PrescriptionRepository;
 import com.harmonycloud.result.CimsResponseWrapper;
+import com.harmonycloud.util.LogUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 @Service
 public class PrescriptionService {
+    private Logger logger = LoggerFactory.getLogger(PrescriptionService.class);
+
 
     @Autowired
     private PrescriptionRepository prescriptionRepository;
 
     @Autowired
     private PrescriptionDrugService prescriptionDrugService;
+
+    @Autowired
+    HttpServletRequest request;
+
+    private String msg;
 
     /**
      * save prescription
@@ -62,8 +73,11 @@ public class PrescriptionService {
      *
      * @param prescriptionDto model
      */
-    @Transactional(rollbackFor = Exception.class)
+
     public void savePrescriptionCancel(PrescriptionDto prescriptionDto) throws Exception {
+        msg = LogUtil.getRequest(request) + ", information='";
+
+        logger.info(msg + "saga ------>save prescription cancel '");
         //delete prescription
         Integer encounterId = prescriptionDto.getPrescription().getEncounterId();
         Prescription prescription = prescriptionRepository.findByEncounterId(encounterId);
@@ -86,7 +100,7 @@ public class PrescriptionService {
     @Transactional(rollbackFor = Exception.class)
     public CimsResponseWrapper<String> updatePrescription(PrescriptionDrugDto prescriptionDrugDto) throws Exception {
 
-        Prescription prescription = prescriptionDrugDto.getOldPrescription();
+        Prescription prescription = prescriptionRepository.findByEncounterId(prescriptionDrugDto.getOldPrescription().getEncounterId());
         UserPrincipal userDetails = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         prescription.setCreateBy(userDetails.getUsername());
@@ -106,7 +120,11 @@ public class PrescriptionService {
      * @param prescriptionDrugDto
      * @throws Exception
      */
+
     public void updatePrescriptionCancel(PrescriptionDrugDto prescriptionDrugDto) throws Exception {
+        msg = LogUtil.getRequest(request) + ", information='";
+
+        logger.info(msg + "saga ------>update prescription cancel '");
 
         Prescription prescription = prescriptionDrugDto.getOldPrescription();
         prescription.setPrescriptionId(prescriptionRepository.findByEncounterId(prescriptionDrugDto.getOldPrescription().getEncounterId()).getPrescriptionId());

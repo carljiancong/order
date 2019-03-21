@@ -5,24 +5,31 @@ import com.harmonycloud.bo.UserPrincipal;
 import com.harmonycloud.dto.Audit;
 import com.harmonycloud.enums.ErrorMsgEnum;
 import com.harmonycloud.exception.OrderException;
+import com.harmonycloud.util.IpUtil;
+import com.harmonycloud.util.LogUtil;
 import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
 import org.apache.rocketmq.client.producer.SendResult;
 import org.apache.rocketmq.client.producer.SendStatus;
 import org.apache.rocketmq.common.message.Message;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StopWatch;
 
 import javax.annotation.PostConstruct;
-import java.net.InetAddress;
+import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.UUID;
 
 
 @Service
 public class RocketMqService {
+    private Logger logger = LoggerFactory.getLogger(RocketMqService.class);
+
 
     private DefaultMQProducer producer;
     /**
@@ -31,8 +38,13 @@ public class RocketMqService {
     @Value("${apache.rocketmq.namesrvAddr}")
     private String namesrvAddr;
 
+    @Autowired
+    private HttpServletRequest request;
+
+
     @PostConstruct
     public void defaultMQProducer() {
+        String msg = LogUtil.getRequest(request) + ", information='";
 
         //生产者的组名
         producer = new DefaultMQProducer("Order");
@@ -41,6 +53,7 @@ public class RocketMqService {
         //producer.setVipChannelEnabled(false);
         try {
             producer.start();
+            logger.info(msg + "-------->:producer启动了'");
             System.out.println("-------->:producer启动了");
         } catch (MQClientException e) {
             e.printStackTrace();
@@ -48,22 +61,22 @@ public class RocketMqService {
     }
 
     public String sendMsg(String topic, String tags, String information) throws Exception {
+        String msg = LogUtil.getRequest(request) + ", information='";
+
         UserPrincipal userDetails = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
 
-        String uuid = null;
-        for (int i = 0; i < 10; i++) {
-            uuid = UUID.randomUUID().toString().replaceAll("-", "");
-        }
-        Audit audit = new Audit(new Date(), "Critical", "Computer", InetAddress.getLocalHost().getHostAddress(),
-                userDetails.getId(), "CIMS", uuid, "MedicationOrder", information);
-
+        String correlation = request.getHeader("x-b3-traceid");
+        Audit audit = new Audit(new Date(), "Critical", "Computer", IpUtil.getIpAddress(request),
+                userDetails.getId(), "CIMS", correlation, "MedicationOrder", information);
 
         Message message = new Message(topic, tags, JSON.toJSONString(audit).getBytes());
         StopWatch stop = new StopWatch();
         stop.start();
         SendResult result = producer.send(message);
         if (result.getSendStatus().equals(SendStatus.SEND_OK)) {
+            logger.info(msg + "send message success'");
+
             System.out.println("发送响应：MsgId:" + result.getMsgId() + "，发送状态:" + result.getSendStatus());
         } else {
             throw new OrderException(ErrorMsgEnum.ROCKETMQ_ERROR.getMessage());

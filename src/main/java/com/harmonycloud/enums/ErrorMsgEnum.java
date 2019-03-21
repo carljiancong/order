@@ -7,6 +7,8 @@ public enum ErrorMsgEnum {
     PARAMETER_ERROR("Parameter error"),
     SAVE_ERROR("Save error"),
     UPDATE_ERROR("Update error"),
+    FORMAT_ERROR("Unable to parse the proxy port number"),
+    AUTHENTICATION_ERROR("Could not set user authentication in security context"),
     ROCKETMQ_ERROR("Rocketmq send message error");
     private String message;
 

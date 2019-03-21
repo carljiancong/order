@@ -1,6 +1,8 @@
 package com.harmonycloud.security;
 
 import com.harmonycloud.bo.UserPrincipal;
+import com.harmonycloud.enums.ErrorMsgEnum;
+import com.harmonycloud.exception.OrderException;
 import com.harmonycloud.util.JwtUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +23,6 @@ import java.util.Map;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -33,13 +34,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             if (StringUtils.hasText(jwt) && jwtUtil.validateToken(jwt)) {
                 Map<String, Object> claims = jwtUtil.getUserInfoFromJWT(jwt);
-                UserPrincipal userDetails=UserPrincipalFactory.createUserPrincipal(jwt,claims);
+                UserPrincipal userDetails = UserPrincipalFactory.createUserPrincipal(jwt, claims);
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         } catch (Exception ex) {
-            logger.error("Could not set user authentication in security context", ex);
+            throw new OrderException(ErrorMsgEnum.AUTHENTICATION_ERROR.getMessage());
         }
 
         filterChain.doFilter(request, response);
