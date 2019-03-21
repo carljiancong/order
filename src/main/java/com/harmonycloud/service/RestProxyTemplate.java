@@ -17,8 +17,6 @@ import java.net.Proxy;
 
 @Component
 public final class RestProxyTemplate {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
-
 
     @Value("${proxy.host:}")
     private String host;
