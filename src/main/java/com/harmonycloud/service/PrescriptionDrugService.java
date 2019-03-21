@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +30,9 @@ public class PrescriptionDrugService {
 
     @Autowired
     private OrderConfigurationProperties config;
+
+    @Autowired
+    private HttpServletRequest request;
 
     /**
      * save prescription_drug
@@ -58,7 +62,7 @@ public class PrescriptionDrugService {
         });
         //send message
         if (json.containsKey("314") || json.containsKey("316")) {
-            rocketMqService.sendMsg("OrderTopic", "OrderPush", getInfo(json.getIntValue("314"), json.getIntValue("316")));
+            rocketMqService.sendMsg("OrderTopic", "OrderPush", getInfo(json.getIntValue("314"), json.getIntValue("316")),request);
         }
 
         return new CimsResponseWrapper<String>(true, null, "Save success");
@@ -84,7 +88,7 @@ public class PrescriptionDrugService {
         });
         //send message
         if (json.containsKey("314") || json.containsKey("316")) {
-            rocketMqService.sendMsg("OrderTopic", "OrderPush", "saga:" + getInfo(-json.getIntValue("314"), -json.getIntValue("316")));
+            rocketMqService.sendMsg("OrderTopic", "OrderPush", "saga:" + getInfo(-json.getIntValue("314"), -json.getIntValue("316")),request);
         }
     }
 
@@ -132,7 +136,7 @@ public class PrescriptionDrugService {
         //send message
         if (oldJson.containsKey("314") || oldJson.containsKey("316") || newJson.containsKey("314") || newJson.containsKey("316")) {
             rocketMqService.sendMsg("OrderTopic", "OrderPush",
-                    getInfo((newJson.getIntValue("314") - oldJson.getIntValue("314")), (newJson.getIntValue("316") - oldJson.getIntValue("316"))));
+                    getInfo((newJson.getIntValue("314") - oldJson.getIntValue("314")), (newJson.getIntValue("316") - oldJson.getIntValue("316"))),request);
         }
         return new CimsResponseWrapper<String>(true, null, "Update  success");
     }
@@ -171,7 +175,7 @@ public class PrescriptionDrugService {
 
         if (oldJson.containsKey("314") || oldJson.containsKey("316") || newJson.containsKey("314") || newJson.containsKey("316")) {
             rocketMqService.sendMsg("OrderTopic", "OrderPush",
-                    "saga:" + getInfo((oldJson.getIntValue("314") - newJson.getIntValue("314")), (oldJson.getIntValue("316") - newJson.getIntValue("316"))));
+                    "saga:" + getInfo((oldJson.getIntValue("314") - newJson.getIntValue("314")), (oldJson.getIntValue("316") - newJson.getIntValue("316"))),request);
         }
     }
 

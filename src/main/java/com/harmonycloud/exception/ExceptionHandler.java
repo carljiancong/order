@@ -28,7 +28,7 @@ public class ExceptionHandler {
         String msg = LogUtil.getRequest(request);
 
         logger.error(msg + ", information='" + e.getMessage() + '\'');
-        if (e instanceof UserException) {
+        if (e instanceof OrderException) {
             return new CimsResponseWrapper<>(false, e.getMessage(), null);
         }
 

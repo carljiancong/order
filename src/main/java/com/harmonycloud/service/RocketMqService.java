@@ -23,7 +23,6 @@ import org.springframework.util.StopWatch;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
-import java.util.UUID;
 
 
 @Service
@@ -38,13 +37,9 @@ public class RocketMqService {
     @Value("${apache.rocketmq.namesrvAddr}")
     private String namesrvAddr;
 
-    @Autowired
-    private HttpServletRequest request;
-
 
     @PostConstruct
     public void defaultMQProducer() {
-        String msg = LogUtil.getRequest(request) + ", information='";
 
         //生产者的组名
         producer = new DefaultMQProducer("Order");
@@ -53,14 +48,13 @@ public class RocketMqService {
         //producer.setVipChannelEnabled(false);
         try {
             producer.start();
-            logger.info(msg + "-------->:producer启动了'");
             System.out.println("-------->:producer启动了");
         } catch (MQClientException e) {
             e.printStackTrace();
         }
     }
 
-    public String sendMsg(String topic, String tags, String information) throws Exception {
+    public String sendMsg(String topic, String tags, String information,HttpServletRequest request) throws Exception {
         String msg = LogUtil.getRequest(request) + ", information='";
 
         UserPrincipal userDetails = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication()
