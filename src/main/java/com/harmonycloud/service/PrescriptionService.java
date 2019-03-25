@@ -2,7 +2,6 @@ package com.harmonycloud.service;
 
 import com.harmonycloud.bo.PrescriptionDrugBo;
 import com.harmonycloud.dto.DrugHistory;
-import com.harmonycloud.dto.PrescriptionDrugDto;
 import com.harmonycloud.bo.UserPrincipal;
 import com.harmonycloud.entity.Prescription;
 import com.harmonycloud.enums.ErrorMsgEnum;
@@ -60,8 +59,9 @@ public class PrescriptionService {
 
     /**
      * saga:save prescription rollback
-     *
      * @param prescription model
+     * @return prescription
+     * @throws Exception
      */
 
     public Prescription savePrescriptionCancel(Prescription prescription) throws Exception {
@@ -97,8 +97,8 @@ public class PrescriptionService {
 
     /**
      * saga: update prescription rollback
-     *
      * @param prescription model
+     * @return prescription
      * @throws Exception
      */
 
@@ -116,7 +116,7 @@ public class PrescriptionService {
      * get drug history
      *
      * @param patientId patientId
-     * @return
+     * @return List
      * @throws Exception
      */
     public List<DrugHistory> listDrugHistory(Integer patientId) throws Exception {
@@ -143,7 +143,7 @@ public class PrescriptionService {
      * get patient prescription and prescription_drug in this encounter
      *
      * @param encounterId encounterId
-     * @return
+     * @return DrugHistory
      * @throws Exception
      */
     public DrugHistory getPrescription(Integer encounterId) throws Exception {

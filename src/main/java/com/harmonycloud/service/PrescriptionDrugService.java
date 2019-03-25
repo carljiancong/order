@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.harmonycloud.bo.PrescriptionDrugBo;
 import com.harmonycloud.bo.UserPrincipal;
 import com.harmonycloud.config.OrderConfigurationProperties;
-import com.harmonycloud.dto.PrescriptionDrugDto;
 import com.harmonycloud.entity.PrescriptionDrug;
 import com.harmonycloud.enums.ErrorMsgEnum;
 import com.harmonycloud.exception.OrderException;
@@ -41,7 +40,6 @@ public class PrescriptionDrugService {
      *
      * @param prescriptionDrugList List<PrescriptionDrug>
      * @param prescriptionId       prescriptionId
-     * @return
      * @throws Exception
      */
 
@@ -99,7 +97,6 @@ public class PrescriptionDrugService {
      * @param oldPrescriptionDrugList List<PrescriptionDrug>
      * @param newPrescriptionDrugList List<PrescriptionDrug>
      * @param prescriptionId          prescriptionId
-     * @return
      * @throws Exception
      */
     public void updatePrescriptionDrug(List<PrescriptionDrug> oldPrescriptionDrugList, List<PrescriptionDrug> newPrescriptionDrugList, Integer prescriptionId) throws Exception {
@@ -186,7 +183,7 @@ public class PrescriptionDrugService {
      * get PrescriptionDrugBoList
      *
      * @param prescriptionId prescriptionId
-     * @return
+     * @return List
      * @throws Exception
      */
     public List<PrescriptionDrugBo> listPrescriptionDrug(Integer prescriptionId) throws Exception {
@@ -226,7 +223,7 @@ public class PrescriptionDrugService {
      *
      * @param juniorNum medication junior number
      * @param adultNum  medication adult number
-     * @return
+     * @return String
      */
     private String getInfo(int juniorNum, int adultNum) {
         StringBuilder info = new StringBuilder();

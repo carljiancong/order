@@ -11,7 +11,6 @@ import com.harmonycloud.result.CimsResponseWrapper;
 import com.harmonycloud.service.PrescriptionDrugService;
 import com.harmonycloud.service.PrescriptionService;
 import com.harmonycloud.util.LogUtil;
-import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import org.apache.servicecomb.saga.omega.transaction.annotations.Compensable;
@@ -26,7 +25,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
-@Api
 @RestController
 public class OrderController {
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -43,7 +41,7 @@ public class OrderController {
      * list drug history by patientId
      *
      * @param patientId patientId
-     * @return
+     * @return CimsResponseWrapper
      * @throws Exception
      */
     @GetMapping("/drugHistory")
@@ -61,8 +59,8 @@ public class OrderController {
     /**
      * get patient prescription by encounterId
      *
-     * @param encounterId
-     * @return
+     * @param encounterId encounterId
+     * @return CimsResponseWrapper
      * @throws Exception
      */
     @GetMapping("/getPrescription")
@@ -81,7 +79,7 @@ public class OrderController {
      * save medication order by save button
      *
      * @param dto model
-     * @return
+     * @return CimsResponseWrapper
      * @throws Exception
      */
     @PostMapping("/saveOrder")
@@ -113,7 +111,7 @@ public class OrderController {
      * update medication order by save button
      *
      * @param dto model
-     * @return
+     * @return CimsResponseWrapper
      * @throws Exception
      */
     @PostMapping("/updateOrder")
@@ -145,7 +143,7 @@ public class OrderController {
      * save medication order by next patient button
      *
      * @param dto model
-     * @return
+     * @return CimsResponseWrapper
      * @throws Exception
      */
     @PostMapping(path = "/savePrescription", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -193,7 +191,7 @@ public class OrderController {
      * update medication order by next patient button
      *
      * @param dto model
-     * @return
+     * @return CimsResponseWrapper
      * @throws Exception
      */
     @PostMapping("/updatePrescription")

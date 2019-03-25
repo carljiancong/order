@@ -17,7 +17,8 @@ public class PrescriptionDrugBo {
     public PrescriptionDrugBo() {
     }
 
-    public PrescriptionDrugBo(Integer prescriptionDrugId, Integer drugId, String tradeName, String ingredient, String regimenLine, Integer prescriptionId) {
+    public PrescriptionDrugBo(Integer prescriptionDrugId, Integer drugId, String tradeName, String ingredient,
+                              String regimenLine, Integer prescriptionId) {
         this.prescriptionDrugId = prescriptionDrugId;
         this.drugId = drugId;
         this.tradeName = tradeName;

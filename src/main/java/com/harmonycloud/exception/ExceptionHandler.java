@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 public class ExceptionHandler {
 
     @Autowired
-    HttpServletRequest request;
+    private HttpServletRequest request;
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
