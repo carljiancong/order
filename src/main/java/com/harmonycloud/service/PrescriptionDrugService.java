@@ -10,6 +10,7 @@ import com.harmonycloud.exception.OrderException;
 import com.harmonycloud.repository.PrescriptionDrugRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -34,6 +35,9 @@ public class PrescriptionDrugService {
 
     @Autowired
     private HttpServletRequest request;
+
+    @Value("${service.drug.rocketmq}")
+    private String drugId;
 
     /**
      * save prescription_drug
@@ -60,6 +64,8 @@ public class PrescriptionDrugService {
                 json.put(drug.getDrugId().toString(), 1);
             }
         });
+
+
         //send message
         if (json.containsKey("314") || json.containsKey("316")) {
             rocketMqService.sendMsg("OrderTopic", "OrderPush", getInfo(json.getIntValue("314"), json.getIntValue("316")), request);

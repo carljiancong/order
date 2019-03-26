@@ -49,6 +49,9 @@ public class PrescriptionService {
         prescription.setCreateBy(userDetails.getUsername());
         prescription.setCreateDate(new Date());
 
+        if (prescriptionRepository.findByEncounterId(prescription.getEncounterId()) != null) {
+            throw new OrderException(ErrorMsgEnum.OTHER_PERSON.getMessage());
+        }
 
         if (prescriptionRepository.save(prescription).getPrescriptionId() == null) {
             throw new OrderException(ErrorMsgEnum.SAVE_ERROR.getMessage());
