@@ -36,9 +36,7 @@ public class PrescriptionDrugService {
     @Autowired
     private HttpServletRequest request;
 
-    @Value("${service.drug.rocketmq}")
-    private String drugId;
-
+   
     /**
      * save prescription_drug
      *
