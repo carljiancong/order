@@ -9,7 +9,9 @@ public enum ErrorMsgEnum {
     UPDATE_ERROR("Update error"),
     FORMAT_ERROR("Unable to parse the proxy port number"),
     AUTHENTICATION_ERROR("Could not set user authentication in security context"),
-    ROCKETMQ_ERROR("Rocketmq send message error");
+    ROCKETMQ_ERROR("Rocketmq send message error"),
+    OTHER_PERSON("The clinical note has been updated by another user");
+
     private String message;
 
     ErrorMsgEnum(String message) {
