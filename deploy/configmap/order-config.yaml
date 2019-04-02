@@ -15,8 +15,8 @@ data:
     spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.Oracle10gDialect
     spring.jpa.hibernate.ddl-auto=validate
     spring.jpa.properties.hibernate.globally_quoted_identifiers=true
-    security.publicKey=http://user/publicKey
-    service.drug=http://drug/drug
+    security.publicKey=http://user:8080/publicKey
+    service.drug=http://drug:8080/drug
     #saga
     alpha.cluster.address=saga-server:8080
     apache.rocketmq.namesrvAddr=rocketmqsvc:9876
