@@ -174,7 +174,8 @@ public class OrderController {
      *
      * @param dto model
      */
-    public void savePrescriptionCancel(PrescriptionDto dto) throws Exception {
+    @PostMapping(path = "savePrescriptionCancel")
+    public void savePrescriptionCancel(@RequestBody PrescriptionDto dto) throws Exception {
         String msg = LogUtil.getRequest(request) + ", information='";
         logger.info(msg + "sage ----> save prescription cancel");
         //save precription cancel
@@ -223,7 +224,8 @@ public class OrderController {
      * @param dto model
      * @throws Exception
      */
-    public void updatePrescriptionDrugCancel(PrescriptionDrugDto dto) throws Exception {
+    @PostMapping(path = "updatePrescriptionCancel")
+    public void updatePrescriptionDrugCancel(@RequestBody PrescriptionDrugDto dto) throws Exception {
         String msg = LogUtil.getRequest(request) + ", information='";
         logger.info(msg + "sage ----> Update prescription cancel");
         Prescription prescription = prescriptionService.updatePrescriptionCancel(dto.getPrescription());
