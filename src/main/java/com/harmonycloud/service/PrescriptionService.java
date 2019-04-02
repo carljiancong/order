@@ -62,18 +62,20 @@ public class PrescriptionService {
 
     /**
      * saga:save prescription rollback
+     *
      * @param prescription model
-     * @return prescription
+     * @return oldPrescription
      * @throws Exception
      */
 
     public Prescription savePrescriptionCancel(Prescription prescription) throws Exception {
-
-
         Prescription oldPrescription = prescriptionRepository.findByEncounterId(prescription.getEncounterId());
+        if (oldPrescription == null) {
+            return null;
+        }
         prescriptionRepository.delete(oldPrescription);
 
-        return prescription;
+        return oldPrescription;
     }
 
     /**
@@ -100,15 +102,19 @@ public class PrescriptionService {
 
     /**
      * saga: update prescription rollback
+     *
      * @param prescription model
      * @return prescription
      * @throws Exception
      */
 
     public Prescription updatePrescriptionCancel(Prescription prescription) throws Exception {
+        Prescription oldPrescription = prescriptionRepository.findByEncounterId(prescription.getEncounterId());
 
-
-        prescription.setPrescriptionId(prescriptionRepository.findByEncounterId(prescription.getEncounterId()).getPrescriptionId());
+        if (oldPrescription == null) {
+            return null;
+        }
+        prescription.setPrescriptionId(oldPrescription.getPrescriptionId());
         prescriptionRepository.save(prescription);
 
         return prescription;
