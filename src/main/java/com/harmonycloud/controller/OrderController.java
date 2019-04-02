@@ -14,6 +14,7 @@ import com.harmonycloud.util.LogUtil;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import org.apache.servicecomb.saga.omega.transaction.annotations.Compensable;
+import org.aspectj.weaver.tools.Trace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -175,17 +176,21 @@ public class OrderController {
      * @param dto model
      */
     @PostMapping(path = "savePrescriptionCancel")
-    public void savePrescriptionCancel(@RequestBody PrescriptionDto dto) throws Exception {
+    @Transactional(rollbackFor = Throwable.class)
+    public CimsResponseWrapper<String> savePrescriptionCancel(@RequestBody PrescriptionDto dto) throws Exception {
         String msg = LogUtil.getRequest(request) + ", information='";
         logger.info(msg + "sage ----> save prescription cancel");
         //save precription cancel
         Prescription prescription = prescriptionService.savePrescriptionCancel(dto.getPrescription());
-
+        if (prescription == null) {
+            return new CimsResponseWrapper<>(true, null, "Save prescription rollback success");
+        }
         logger.info(msg + "sage ----> save prescription drug cancel");
         //delete prescriptionDrug
-        if (dto.getPrescriptionDrugList() == null) {
+        if (dto.getPrescriptionDrugList() != null) {
             prescriptionDrugService.savePrescriptionDrugCancel(prescription.getPrescriptionId());
         }
+        return new CimsResponseWrapper<>(true, null, "Save prescription rollback success");
     }
 
     /**
@@ -225,15 +230,19 @@ public class OrderController {
      * @throws Exception
      */
     @PostMapping(path = "updatePrescriptionCancel")
-    public void updatePrescriptionDrugCancel(@RequestBody PrescriptionDrugDto dto) throws Exception {
+    @Transactional(rollbackFor = Throwable.class)
+    public CimsResponseWrapper<String> updatePrescriptionDrugCancel(@RequestBody PrescriptionDrugDto dto) throws Exception {
         String msg = LogUtil.getRequest(request) + ", information='";
         logger.info(msg + "sage ----> Update prescription cancel");
         Prescription prescription = prescriptionService.updatePrescriptionCancel(dto.getPrescription());
-
+        if (prescription == null) {
+            return new CimsResponseWrapper<>(true, null, "Update prescription rollback success");
+        }
         if (dto.getOldPrescriptionDrugList() != null || dto.getNewPrescriptionDrugList() != null) {
             logger.info(msg + "sage ----> Update prescription drug cancel");
             prescriptionDrugService.updatePrescriptionDrugCancel(dto.getOldPrescriptionDrugList(), prescription.getPrescriptionId());
         }
+        return new CimsResponseWrapper<>(true, null, "Update prescription rollback success");
     }
 
 }
